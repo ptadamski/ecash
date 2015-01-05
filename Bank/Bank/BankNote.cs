@@ -15,7 +15,7 @@ namespace Bank
         public string Hash { get; set; }
 
         [DataMember()]
-        public BigInteger RandInt { get; set; }
+        public BigInteger RandBigInt { get; set; }
     }
 
 
