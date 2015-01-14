@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="BankNote.cs" />
     <Compile Include="BankService.cs" />
+    <Compile Include="CipherStreamWrapper.cs" />
     <Compile Include="IBankService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

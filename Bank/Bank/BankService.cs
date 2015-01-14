@@ -112,7 +112,6 @@ namespace Bank
                     return;
                 if (banknote.SerialNumber != agreement[sesId].SerialNumber)
                     return;
-                banknote.Left.
             }
 
 

@@ -150,7 +150,7 @@ namespace Bank
 
         static private void testSig(int id, RsaKeyParameters pub, RsaKeyParameters prv, byte[] msg)
         {
-            RsaBlindingFactorGenerator blindFactorGen = new RsaBlindingFactorGenerator();
+           /* RsaBlindingFactorGenerator blindFactorGen = new RsaBlindingFactorGenerator();
             RsaBlindingEngine blindingEngine = new RsaBlindingEngine();
             PssSigner blindSigner = new PssSigner(blindingEngine, new Sha1Digest(), 20);
             PssSigner signer = new PssSigner(new RsaEngine(), new Sha1Digest(), 20);
@@ -216,7 +216,7 @@ namespace Bank
             //}
             //{
            //     Fail("test " + id + " failed PssSigner verification");
-           // }
+           // }       */
         }
 
         static void Main(string[] args)
@@ -273,8 +273,8 @@ namespace Bank
             Console.ReadLine();*/
 
 
-            byte[] msg = Encoding.ASCII.GetBytes("I feel great");
-            testSig(1, pub1, prv1, msg);
+            //byte[] msg = Encoding.ASCII.GetBytes("I feel great");
+            //testSig(1, pub1, prv1, msg);
 
         }
     }
