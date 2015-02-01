@@ -13,6 +13,12 @@ using Org.BouncyCastle.Math;
 using System.Xml.Serialization;
 using System.IO;
 using Org.BouncyCastle.Crypto.Digests;
+using Common;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Pkcs;
+using Org.BouncyCastle.X509;
+using Org.BouncyCastle.Asn1.Pkcs;
 
 namespace Bank
 {
@@ -25,117 +31,99 @@ namespace Bank
         public int Count { get; set; }
     }
 
-    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.PerSession)]
+    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.PerCall)]
     public partial class BankService : IBankService
     {
         static Dictionary<Guid, int> banknotes = new Dictionary<Guid, int>();
         static Dictionary<string, Guid> sesPerGuid = new Dictionary<string, Guid>();
 
-        //klucz powinien byc zczytywany z pliku    
-        static RsaKeyParameters pubKey = null;
-        static RsaKeyParameters prvKey = null;
+
+
+        //klucz powinien byc zczytywany z pliku 
+
+        static private AsymmetricCipherKeyPair _keyPair = ReadKeyPair(1024);
+        static private AsymmetricCipherKeyPair ReadKeyPair(int strength) 
+        {
+            var kg = new RsaKeyPairGenerator();
+            kg.Init(new KeyGenerationParameters(new SecureRandom(), strength));
+            return kg.GenerateKeyPair(); 
+        }
+
+
 
         //zapisywane na potrzeby porozumienia bitowego
         static Dictionary<string, Agreement> agreement = new Dictionary<string, Agreement>();
 
-        public void doBankNoteInit(int nominal)
+        public void doCreate(BankNote banknote)
         {
+
+            Sha256Digest digester = new Sha256Digest();
+            digester.DoFinal()
+
             IOnBankServiceCallback callback = OperationContext.Current.GetCallbackChannel<IOnBankServiceCallback>();
             string sesId = OperationContext.Current.SessionId;
 
-            Guid id = Guid.NewGuid();
-            int val = 0;
-            while (banknotes.TryGetValue(id, out val))
-                id = Guid.NewGuid();
-            agreement[sesId].Nominal = nominal;  
-            agreement[sesId].SerialNumber = id;
-            agreement[sesId].Count = 100;
-            callback.onBeforeAgreementInit(id, nominal, 100, pubKey);
+            System.Console.WriteLine(banknote.Serial);
+            System.Console.WriteLine(banknote.Value);
+
+            callback.onBeforeAgreementInit(banknote, 100);
+
+            callback.onPublicKey((_keyPair.Public as RsaKeyParameters).AsPublic());
         }
 
-        public void doBankNoteValidate(string banknote, string signature)
-        {
-            throw new NotImplementedException();
+        public void doValidate(string banknote, string signature)  
+        {                             
+            var data = banknote.GetBytes();
+            var sign = signature.GetBytes();
+
+            IOnBankServiceCallback callback = OperationContext.Current.GetCallbackChannel<IOnBankServiceCallback>();
+            RsaEngine eng = new RsaEngine();
+            eng.Init(false, _keyPair.Private);
+            var encoded = eng.ProcessBlock(data, 0, data.Length);
+
+            bool result = encoded.Length == sign.Length;
+            if (result)
+                for (int i = 0; i < encoded.Length; i++)
+                    if (encoded[i] != sign[i])
+                    {
+                        result = false;
+                        break;
+                    }
+            callback.onBankNoteValidate(banknote, signature, result);
         }
 
         public void doAgreementInit(string[] blindedMessageList)
         {
             IOnBankServiceCallback callback = OperationContext.Current.GetCallbackChannel<IOnBankServiceCallback>();
             string sesId = OperationContext.Current.SessionId;
-            agreement[sesId].BlindedMessages = blindedMessageList;
-            agreement[sesId].ExcludedItem = new Random().Next(0, blindedMessageList.Length - 1);
-            callback.onBeforeAgreementVerf(agreement[sesId].ExcludedItem);
         }
 
         public void doAgreementVerf(string[] messageList, string[] blindingFactorList)
         {
             IOnBankServiceCallback callback = OperationContext.Current.GetCallbackChannel<IOnBankServiceCallback>();
             string sesId = OperationContext.Current.SessionId;
-
-            RsaBlindingEngine blindingEngine = new RsaBlindingEngine();
-            RsaBlindingParameters parameters = null;
-            BigInteger temp = null;
-
-            for (int i = 0; i < agreement[sesId].ExcludedItem; i++)
-            {
-                parameters = new RsaBlindingParameters(pubKey, new BigInteger(blindingFactorList[i]));
-                blindingEngine.Init(true, parameters);
-                temp = new BigInteger(blindingEngine.ProcessBlock(Encoding.UTF8.GetBytes(messageList[i]), 0, messageList[i].Length));
-                if (agreement[sesId].BlindedMessages[i] != temp.ToString())
-                    return;
-            }
-
-            for (int i = agreement[sesId].ExcludedItem + 1; i < messageList.Length; i++)
-            {
-                parameters = new RsaBlindingParameters(pubKey, new BigInteger(blindingFactorList[i]));
-                blindingEngine.Init(true, parameters);
-                temp = new BigInteger(blindingEngine.ProcessBlock(Encoding.UTF8.GetBytes(messageList[i]), 0, messageList[i].Length));
-                if (agreement[sesId].BlindedMessages[i] != temp.ToString())
-                    return;
-            }
-
-            BankNote banknote = null;
-
-            for (int i = 0; i < agreement[sesId].ExcludedItem; i++)
-            {                                                  
-                banknote = FromXml<BankNote>(messageList[i]);
-                if(banknote.Nominal != agreement[sesId].Nominal)
-                    return;
-                if (banknote.SerialNumber != agreement[sesId].SerialNumber)    
-                    return;
-            }
-
-            for (int i = agreement[sesId].ExcludedItem + 1; i < messageList.Length; i++)
-            {
-                banknote = FromXml<BankNote>(messageList[i]);
-                if (banknote.Nominal != agreement[sesId].Nominal)
-                    return;
-                if (banknote.SerialNumber != agreement[sesId].SerialNumber)
-                    return;
-            }
-
-
-            byte[] data = Encoding.UTF8.GetBytes(agreement[sesId].BlindedMessages[agreement[sesId].ExcludedItem]);
-            RsaEngine rsaEngine = new RsaEngine();
-            rsaEngine.Init(true, prvKey);
-            string blindSignature = Encoding.UTF8.GetString(rsaEngine.ProcessBlock(data, 0, data.Length));
-            callback.onAfterAgreementVerf(blindSignature);
-        }
-
-        static public string ToXml<T>(T e)
-        {
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
-            StringWriter textWriter = new StringWriter();
-            serializer.Serialize(textWriter, e);
-            return textWriter.ToString();
-        }
-
-        static T FromXml<T>(string str)
-        {
-            XmlSerializer deserializer = new XmlSerializer(typeof(T));
-            TextReader textReader = new StringReader(str);
-            return  (T) deserializer.Deserialize(textReader);
         }
     }
              
 }
+
+/*
+            RsaBlindingFactorGenerator blindFactorGen = new RsaBlindingFactorGenerator();
+            RsaBlindingEngine blindingEngine = new RsaBlindingEngine();
+            blindFactorGen.Init(pub);
+
+            BigInteger blindFactor = new BigInteger("7");//blindFactorGen.GenerateBlindingFactor();
+            RsaBlindingParameters parameters = new RsaBlindingParameters(pub, blindFactor);//Z^E (mod N)
+            //blind message
+            blindingEngine.Init(true, parameters);
+            blindedData = blindingEngine.ProcessBlock(msg, 0, msg.Length);//Y = M*Z^E 
+
+            RsaBlindedEngine rsaBlinded = new RsaBlindedEngine();
+            rsaBlinded.Init(true, prv);
+            byte[] blinded = rsaBlinded.ProcessBlock(blindedData, 0, blindedData.Length);//Y^D =(M*Z^E)^D=M^D *Z^(E*D)= M^D * Z^1
+
+            // unblind the signature
+            RsaBlindingEngine unblindingEngine = new RsaBlindingEngine();
+            unblindingEngine.Init(true, parameters);
+            byte[] s = unblindingEngine.ProcessBlock(blindedData, 0, blindedData.Length);//Y^D * Z^-1 = M^D * Z^1 * Z^-1 = M^D
+ */

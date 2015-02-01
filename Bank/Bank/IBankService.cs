@@ -14,20 +14,11 @@ namespace Bank
     [ServiceContract(CallbackContract = typeof(IOnBankServiceCallback))]
     interface IBankService
     {
-        /// <summary>
-        /// tworzenie banknotu
-        /// </summary>
-        /// <param name="nominal">wartosc nominalu</param>
-        [OperationContract(IsOneWay=true, IsInitiating=true)]
-        void doBankNoteInit(int nominal);
-
-        /// <summary>
-        /// weryfikacja banknotu
-        /// </summary>
-        /// <param name="banknote">zserializowany i zaszyfrowany banknot</param>
-        /// <param name="signature">signatura nadana przez bank</param>               
-        [OperationContract(IsOneWay = true, IsTerminating = true)]
-        void doBankNoteValidate(string banknote, string signature);
+        [OperationContract(IsOneWay=true)]
+        void doCreate(BankNote banknote);
+            
+        [OperationContract(IsOneWay = true)]
+        void doValidate(string banknote, string signature);
 
         [OperationContract(IsOneWay = true)]
         void doAgreementInit(string[] blindedMessageList);
@@ -39,12 +30,11 @@ namespace Bank
 
     interface IOnBankServiceCallback
     {
-        /// <summary>
-        /// zdarzenie odpalane podczas procedury tworzenia banknotu
-        /// </summary>
-        /// <param name="serialNumber">128 bitowy numer seryjny dostepny dla klienta</param>
         [OperationContract(IsOneWay = true)]
-        void onBeforeAgreementInit(Guid serialNumber, int nominal, int copiesCount, AsymmetricKeyParameter pubKey);
+        void onBeforeAgreementInit(BankNote banknote, int count);
+
+        [OperationContract(IsOneWay = true)]
+        void onPublicKey(string pubKey);
                               
         [OperationContract(IsOneWay = true)]
         void onBeforeAgreementVerf(int excludeFromAgreement);
@@ -52,12 +42,6 @@ namespace Bank
         [OperationContract(IsOneWay = true)]
         void onAfterAgreementVerf(string blindSignature);
 
-        /// <summary>
-        /// odpowiedz na weryfikacje bannotu
-        /// </summary>
-        /// <param name="banknote">zserializowany i zaszyfrowany banknot</param>
-        /// <param name="signature">signatura nadana przez bank</param>
-        /// <param name="result">wynik sprawdzenia poprawnosci</param>
         [OperationContract(IsOneWay = true)]
         void onBankNoteValidate(string banknote, string signature, bool result);
     }

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" xmlns:tns="http://schemas.datacontract.org/2004/07/Bank" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/Bank" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:complexType name="BankNote">
+    <xs:sequence>
+      <xs:element name="Serial" type="ser:guid" />
+      <xs:element name="Value" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BankNote" nillable="true" type="tns:BankNote" />
+</xs:schema>

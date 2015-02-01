@@ -8,30 +8,27 @@ using System.Threading.Tasks;
 
 namespace Bank
 {
-    [DataContract()]
-    public class IdPart
+
+    [DataContract(IsReference=true)]
+    public class IdSeq
     {
-        [DataMember()]
+        [DataMember(IsRequired = true)]
+        public Guid RandNum { get; set; }
+
+        [DataMember(IsRequired = true)]
         public string Hash { get; set; }
-
-        [DataMember()]
-        public BigInteger RandBigInt { get; set; }
     }
-
 
     [DataContract()]
     public class BankNote
     {
-        [DataMember()]
-        public int Nominal { get; set; }
+        [DataMember(IsRequired=true)]
+        public int Value { get; set; }
 
-        [DataMember()]
-        public Guid SerialNumber { get; set; }
+        [DataMember(IsRequired = true)]
+        public Guid Serial { get; set; }
 
-        [DataMember()]
-        public IdPart Left { get; set; }
-
-        [DataMember()]
-        public IdPart Rigth { get; set; }
+        [DataMember(IsRequired = false)]
+        public IdSeq[] UserIdentity { get; set; }
     }
 }
