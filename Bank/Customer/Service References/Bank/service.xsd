@@ -43,8 +43,7 @@
   <xs:element name="onPublicKey">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="e" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="n" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="pubKey" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

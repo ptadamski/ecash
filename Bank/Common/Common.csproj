@@ -41,7 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CipherStreamWrapper.cs" />
+    <Compile Include="AsymmetricCipherStream.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="StringExt.cs" />
     <Compile Include="XmlExt.cs" />
@@ -52,6 +52,9 @@
       <Project>{38872a5f-e87e-4fad-b109-8eb7b2e6a4a0}</Project>
       <Name>crypto</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

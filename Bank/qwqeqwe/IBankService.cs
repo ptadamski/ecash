@@ -14,24 +14,24 @@ namespace Bank
     [ServiceContract(CallbackContract = typeof(IOnBankServiceCallback))]
     interface IBankService
     {
-        [OperationContract(IsOneWay=true, IsTerminating=false, IsInitiating=true)]
-        void doCreate(int value);
-
-        [OperationContract(IsOneWay = true, IsTerminating = true, IsInitiating = false)]
-        void doValidate(BankNote banknote, string signature);
+        [OperationContract(IsOneWay=true)]
+        void doCreate(BankNote banknote);
+            
+        [OperationContract(IsOneWay = true)]
+        void doValidate(string banknote, string signature);
 
         [OperationContract(IsOneWay = true)]
-        void doAgreementInit(string[] blindedBanknoteList);
+        void doAgreementInit(string[] blindedMessageList);
 
         [OperationContract(IsOneWay = true)]
-        void doAgreementVerf(SecretBankNote[] banknoteList);
+        void doAgreementVerf(string[] messageList, string[] blindingFactorList);
     }
 
 
     interface IOnBankServiceCallback
     {
         [OperationContract(IsOneWay = true)]
-        void onBeforeAgreementInit(int value, Guid serial, int count);
+        void onBeforeAgreementInit(BankNote banknote, int count);
 
         [OperationContract(IsOneWay = true)]
         void onPublicKey(string pubKey);
@@ -43,6 +43,6 @@ namespace Bank
         void onAfterAgreementVerf(string blindSignature);
 
         [OperationContract(IsOneWay = true)]
-        void onBankNoteValidate(Guid serial, string signature, bool result);
+        void onBankNoteValidate(string banknote, string signature, bool result);
     }
 }

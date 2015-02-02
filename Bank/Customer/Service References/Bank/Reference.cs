@@ -24,6 +24,9 @@ namespace Customer.Bank {
         
         private System.Guid SerialField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private Customer.Bank.IdSeq UserIdentityField;
+        
         private int ValueField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
@@ -49,6 +52,19 @@ namespace Customer.Bank {
             }
         }
         
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public Customer.Bank.IdSeq UserIdentity {
+            get {
+                return this.UserIdentityField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.UserIdentityField, value) != true)) {
+                    this.UserIdentityField = value;
+                    this.RaisePropertyChanged("UserIdentity");
+                }
+            }
+        }
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public int Value {
             get {
@@ -58,6 +74,65 @@ namespace Customer.Bank {
                 if ((this.ValueField.Equals(value) != true)) {
                     this.ValueField = value;
                     this.RaisePropertyChanged("Value");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="IdSeq", Namespace="http://schemas.datacontract.org/2004/07/Bank")]
+    [System.SerializableAttribute()]
+    public partial class IdSeq : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private string HashField;
+        
+        private System.Guid RandNumField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string Hash {
+            get {
+                return this.HashField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.HashField, value) != true)) {
+                    this.HashField = value;
+                    this.RaisePropertyChanged("Hash");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public System.Guid RandNum {
+            get {
+                return this.RandNumField;
+            }
+            set {
+                if ((this.RandNumField.Equals(value) != true)) {
+                    this.RandNumField = value;
+                    this.RaisePropertyChanged("RandNum");
                 }
             }
         }
@@ -108,7 +183,7 @@ namespace Customer.Bank {
         void onBeforeAgreementInit(Customer.Bank.BankNote banknote, int count);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/onPublicKey")]
-        void onPublicKey(string e, string n);
+        void onPublicKey(string pubKey);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/onBeforeAgreementVerf")]
         void onBeforeAgreementVerf(int excludeFromAgreement);

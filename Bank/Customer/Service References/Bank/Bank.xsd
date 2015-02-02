@@ -4,8 +4,16 @@
   <xs:complexType name="BankNote">
     <xs:sequence>
       <xs:element name="Serial" type="ser:guid" />
+      <xs:element minOccurs="0" name="UserIdentity" nillable="true" type="tns:IdSeq" />
       <xs:element name="Value" type="xs:int" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="BankNote" nillable="true" type="tns:BankNote" />
+  <xs:complexType name="IdSeq">
+    <xs:sequence>
+      <xs:element name="Hash" nillable="true" type="xs:string" />
+      <xs:element name="RandNum" type="ser:guid" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="IdSeq" nillable="true" type="tns:IdSeq" />
 </xs:schema>

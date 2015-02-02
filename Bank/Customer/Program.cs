@@ -2,6 +2,7 @@
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.IO;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Crypto.Encodings;
@@ -78,33 +79,6 @@ namespace Customer
            // service.doCreate(banknote);
         //}
 
-        public class BankCallbackHandler : Bank.IBankServiceCallback 
-        {
-            public void onBeforeAgreementInit(Bank.BankNote banknote, int count)
-            {
-                Console.WriteLine("onBeforeAgreementInit");
-            }
-
-            public void onPublicKey(string e, string n)
-            {
-                Console.WriteLine("onPublicKey");
-            }
-
-            public void onBeforeAgreementVerf(int excludeFromAgreement)
-            {
-                Console.WriteLine("onBeforeAgreementVerf");
-            }
-
-            public void onAfterAgreementVerf(string blindSignature)
-            {
-                Console.WriteLine("onAfterAgreementVerf");
-            }
-
-            public void onBankNoteValidate(string banknote, string signature, bool result)
-            {
-                Console.WriteLine("onBankNoteValidate");
-            }
-        }
 
         static public void Main(string[] args)
         {
@@ -114,7 +88,28 @@ namespace Customer
                 Bank.BankNote banknote = new Bank.BankNote();
                 banknote.Serial = Guid.NewGuid();
                 banknote.Value = 9000;
-                service.doCreate(banknote);
+                //service.doCreate(banknote);
+
+
+                Sha512Digest digester = new Sha512Digest();
+                digester.BlockUpdate(banknote.Serial.ToByteArray(), 0, banknote.Serial.ToByteArray().Length);
+                byte[] digestedBytes = new byte[digester.GetByteLength()];
+                digester.DoFinal(digestedBytes, 0);
+
+                Console.WriteLine(digestedBytes.Length);
+
+                banknote.UserIdentity = new Bank.IdSeq() { Hash = digestedBytes.GetString(), RandNum = Guid.NewGuid() };
+
+
+                var xml = banknote.ToXml();
+
+                System.IO.StreamWriter sw = new System.IO.StreamWriter("test.xml");
+                sw.Write(xml);
+                sw.Close();
+
+                Console.WriteLine(banknote.UserIdentity.Hash.Length);
+                Console.WriteLine(banknote.ToXml().Length);
+
             }
 
             catch (Exception ex)

@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Common
 {
-    class AsymmetricCipherStream : IAsymmetricBlockCipher  
+    public class AsymmetricCipherStream : IAsymmetricBlockCipher  
     {
         public AsymmetricCipherStream(IAsymmetricBlockCipher cipher)
         {
-
+            this.cipher = cipher;
         }
 
         private IAsymmetricBlockCipher cipher;
@@ -40,8 +40,8 @@ namespace Common
 
         public byte[] ProcessBlock(byte[] inBuf, int inOff, int inLen)
         {
-            if(inLen + inOff > inBuf.Length)
-                throw new CryptoException("block too small");
+            //if(inLen + inOff > inBuf.Length)
+            //    throw new CryptoException("block too small");
 
             MemoryStream stream = new MemoryStream();
                   

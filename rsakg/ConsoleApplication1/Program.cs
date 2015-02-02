@@ -18,10 +18,12 @@ namespace ConsoleApplication1
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("stworzono generator kluczy");
             var kg = new RsaKeyPairGenerator(); 
             int strength = args.Length>2 ? int.Parse(args[1]) : 1024;
             kg.Init(new KeyGenerationParameters(new SecureRandom(), strength));
             var pair = kg.GenerateKeyPair();
+            Console.WriteLine("wygerowano klucze");
 
             PrivateKeyInfo privateKeyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(pair.Private);
             byte[] serializedPrivateBytes = privateKeyInfo.ToAsn1Object().GetDerEncoded();
@@ -31,6 +33,8 @@ namespace ConsoleApplication1
             byte[] serializedPublicBytes = publicKeyInfo.ToAsn1Object().GetDerEncoded();
             string serializedPublic = Convert.ToBase64String(serializedPublicBytes);
 
+            Console.WriteLine("gotowy do zapisu");
+
             StreamWriter sw_prv = new StreamWriter("rsa.prv");
             sw_prv.Write(serializedPrivate);
             sw_prv.Close();
@@ -39,6 +43,7 @@ namespace ConsoleApplication1
             sw_pub.Write(serializedPublic);
             sw_pub.Close();
 
+            Console.WriteLine("zapisano");
             //RsaPrivateCrtKeyParameters privateKey = (RsaPrivateCrtKeyParameters) PrivateKeyFactory.CreateKey(Convert.FromBase64String(serializedPrivate));
             //RsaKeyParameters publicKey = (RsaKeyParameters)PublicKeyFactory.CreateKey(Convert.FromBase64String(serializedPublic));
 

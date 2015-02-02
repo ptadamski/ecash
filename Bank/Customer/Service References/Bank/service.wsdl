@@ -135,9 +135,9 @@
   </wsdl:binding>
   <wsdl:service name="BankService">
     <wsdl:port name="NetTcpBinding_IBankService" binding="tns:NetTcpBinding_IBankService">
-      <soap12:address location="net.tcp://localhost:2000/Bank" />
+      <soap12:address location="net.tcp://localhost:2100/Bank" />
       <wsa10:EndpointReference>
-        <wsa10:Address>net.tcp://localhost:2000/Bank</wsa10:Address>
+        <wsa10:Address>net.tcp://localhost:2100/Bank</wsa10:Address>
       </wsa10:EndpointReference>
     </wsdl:port>
   </wsdl:service>

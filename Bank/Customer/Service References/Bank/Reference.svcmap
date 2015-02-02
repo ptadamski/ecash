@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="2f7a1930-d3d6-4f78-9d0d-7a8af5ca11cf" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="412f983c-6b03-4764-b7f0-cf06884d27c2" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -19,14 +19,14 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="net.tcp://localhost:2000/Bank/mex" Protocol="mex" SourceId="1" />
+    <MetadataSource Address="net.tcp://localhost:2100/Bank/mex" Protocol="mex" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="3052f515-d8ac-45e4-9cb6-1aebf3af4cd1" SourceId="1" SourceUrl="net.tcp://localhost:2000/Bank/mex" />
-    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="2b983209-d95a-4afd-b810-356f40e0506f" SourceId="1" SourceUrl="net.tcp://localhost:2000/Bank/mex" />
-    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="2eb58f56-e656-4f31-b4f2-42d928ec308f" SourceId="1" SourceUrl="net.tcp://localhost:2000/Bank/mex" />
-    <MetadataFile FileName="Bank.xsd" MetadataType="Schema" ID="7085028d-a329-4076-ab77-a1df6b05bde1" SourceId="1" SourceUrl="net.tcp://localhost:2000/Bank/mex" />
-    <MetadataFile FileName="Arrays.xsd" MetadataType="Schema" ID="35939d22-cd6a-4541-8adc-211a6793286f" SourceId="1" SourceUrl="net.tcp://localhost:2000/Bank/mex" />
+    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="1f496961-92d1-49c2-9ec3-99819b7ffb1b" SourceId="1" SourceUrl="net.tcp://localhost:2100/Bank/mex" />
+    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="c978891b-7504-4c11-9af0-9f2189d0520b" SourceId="1" SourceUrl="net.tcp://localhost:2100/Bank/mex" />
+    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="0d6a4507-811d-4261-9fe2-195344e26cca" SourceId="1" SourceUrl="net.tcp://localhost:2100/Bank/mex" />
+    <MetadataFile FileName="Bank.xsd" MetadataType="Schema" ID="adbbd681-90a8-4f38-855b-875c02ff0371" SourceId="1" SourceUrl="net.tcp://localhost:2100/Bank/mex" />
+    <MetadataFile FileName="Arrays.xsd" MetadataType="Schema" ID="92b4b665-2b39-4e72-8bc5-6cce0a0cdd6d" SourceId="1" SourceUrl="net.tcp://localhost:2100/Bank/mex" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
