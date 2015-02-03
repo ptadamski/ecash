@@ -13,11 +13,11 @@ namespace Common
             return textWriter.ToString();
         }
 
-        static public void FromXml<T>(this string str, out T e)
+        static public T FromXml<T>(this string str)
         {
             XmlSerializer deserializer = new XmlSerializer(typeof(T));
             TextReader textReader = new StringReader(str);
-            e = (T) deserializer.Deserialize(textReader);
+            return (T) deserializer.Deserialize(textReader);
         }
     }
 }

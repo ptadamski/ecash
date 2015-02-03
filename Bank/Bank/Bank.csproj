@@ -44,8 +44,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BankNote.cs" />
-    <Compile Include="BankService.cs" />
-    <Compile Include="IBankService.cs" />
+    <Compile Include="Interfaces\Banknote.cs" />
+    <Compile Include="Interfaces\IBankServiceCallback.cs" />
+    <Compile Include="Interfaces\IBankServiceProxyCallback.cs" />
+    <Compile Include="Model\BanknoteFactory.cs" />
+    <Compile Include="Model\BankRepository.cs" />
+    <Compile Include="Model\BankServiceImpl.cs" />
+    <Compile Include="Model\BankService.cs" />
+    <Compile Include="Interfaces\IBankService.cs" />
+    <Compile Include="Interfaces\IBanknoteFactory.cs" />
+    <Compile Include="Interfaces\IBanknoteRepository.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

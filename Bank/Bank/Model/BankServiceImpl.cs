@@ -22,107 +22,76 @@ using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Crypto.IO;
 using Org.BouncyCastle.Crypto.Signers;
 
-namespace Bank
+namespace Bank.Model
 {
-    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.PerCall)]
-    public partial class BankService : IBankService
+    using Interfaces;
+
+    public partial class BankServiceImpl
     {
+        #region fields
 
-        public class Agreement
-        {
-            public string[] blindedMessages;
-            public int without;
-            public Guid serial;
-        }
-
+        IBankServiceProxyCallback _callback;
+        IBanknoteRepository _repository;    
+        IBanknoteFactory _factory;
+        IBankService _service;
+        private static RsaKeyParameters _pub;
+        static RsaKeyParameters _prv; 
         static Random _rand = new Random();
-        static Dictionary<Guid, Agreement> _agreements = new Dictionary<Guid, Agreement>();
-        static Dictionary<string, Guid> _guids = new Dictionary<string, Guid>();
 
-        //klucz powinien byc zczytywany z pliku 
+        #endregion
 
-        static private AsymmetricCipherKeyPair _keyPair = ReadKeyPair(12 * 1024);
-
-        static private AsymmetricCipherKeyPair ReadKeyPair(int strength)
+        #region ctors
+ 
+        public BankServiceImpl(RsaKeyParameters pub, RsaKeyParameters prv,
+            IBanknoteFactory factory, IBanknoteRepository repository, 
+            IBankService _service, IBankServiceProxyCallback callback)
         {
-            var kg = new RsaKeyPairGenerator();
-            kg.Init(new KeyGenerationParameters(new SecureRandom(), strength));
-            return kg.GenerateKeyPair();
+            BankServiceImpl._prv = prv;
+            BankServiceImpl._pub = pub;
+            this._repository = repository;
+            this._service = _service;
+            this._factory = factory;
+            this._callback = callback;
         }
 
-        public BankService()
+        public BankServiceImpl(IBanknoteFactory factory, IBanknoteRepository repository,
+            IBankService _service, IBankServiceProxyCallback callback)
         {
-            OperationContext.Current.InstanceContext.Closed += Cleanup;
+            this._service = _service;
+            this._repository = repository;
+            this._factory = factory;
+            this._callback = callback;
         }
 
-        public void Cleanup(object sender, EventArgs e)
+        public BankServiceImpl(RsaKeyParameters pub, RsaKeyParameters prv)
         {
-            string sesId = OperationContext.Current.SessionId;
-
-            var guid = _guids[sesId];
-            var agreement = _agreements[guid];
-
-            _guids.Remove(sesId);
-            _agreements.Remove(guid);
-
-            OperationContext.Current.InstanceContext.Closed -= Cleanup;
+            BankServiceImpl._prv = prv;
+            BankServiceImpl._pub = pub;
         }
 
-        public void doCreate(int value)
+        #endregion
+
+        public void doHandshake(int value)
         {
-            IOnBankServiceCallback callback = OperationContext.Current.GetCallbackChannel<IOnBankServiceCallback>();
-            string sesId = OperationContext.Current.SessionId;
-
-            var banknote = new BankNote();
-            var serial = InitBanknote(sesId);
-
-            callback.onBeforeAgreementInit(value, serial, BanknoteConstants.BANKNOTE_COUNT);
-            callback.onPublicKey((_keyPair.Public as RsaKeyParameters).AsPublic());
+            var banknote = _factory.CreateBanknote(_service.SessionId);
+            _callback.onHandshake(banknote, BanknoteConstants.BANKNOTE_COUNT, BanknoteConstants.IDSEQ_COUNT, _pub);
+        }
+        
+        public void doInitialize(IList<byte[]> blindedBanknoteList)
+        {
+            int without = _rand.Next();
+            _factory.MakeAgreement(_service.SessionId, blindedBanknoteList, without);
+            _callback.onInitialize(_factory.GetAgreementContext(_service.SessionId), without);
         }
 
-        public void doValidate(BankNote banknote, string signature)
+        public void doVerify()
         {
-            var data = banknote.GetBytes();
-            var sign = signature.GetBytes();
+            var banknote = _factory.GetAgreementContext(_service.SessionId);
 
-            IOnBankServiceCallback callback = OperationContext.Current.GetCallbackChannel<IOnBankServiceCallback>();
-            RsaEngine eng = new RsaEngine();
-            eng.Init(false, _keyPair.Private);
-            var encoded = eng.ProcessBlock(data, 0, data.Length);
-
-            bool result = encoded.Length == sign.Length;
-            if (result)
-                for (int i = 0; i < encoded.Length; i++)
-                    if (encoded[i] != sign[i])
-                    {
-                        result = false;
-                        break;
-                    }
-            callback.onBankNoteValidate(banknote.Serial, signature, result);
-        }
-
-        public void doAgreementInit(string[] blindedBanknoteList)
-        {
-            IOnBankServiceCallback callback = OperationContext.Current.GetCallbackChannel<IOnBankServiceCallback>();
-            string sesId = OperationContext.Current.SessionId;
-
-            if (_guids.ContainsKey(sesId))
+            if (banknote != null)
             {
-                var guid = _guids[sesId];
-                var agree = _agreements[guid];
 
-                agree.without = _rand.Next(0, Common.BanknoteConstants.BANKNOTE_COUNT);
-                agree.serial = guid;
-                agree.blindedMessages = blindedMessageList;
-
-                callback.onBeforeAgreementVerf(agree.without);
             }
-        }
-
-        public void doAgreementVerf(SecretBankNote[] banknoteList)
-        {
-            IOnBankServiceCallback callback = OperationContext.Current.GetCallbackChannel<IOnBankServiceCallback>();
-            string sesId = OperationContext.Current.SessionId;
 
             if (_guids.ContainsKey(sesId))
             {
@@ -186,6 +155,27 @@ namespace Bank
                 //return (M,S)
                 #endregion
             }
+        }
+
+        public void doValidate(BankNote banknote, string signature)
+        {   /*
+            var data = banknote.GetBytes();
+            var sign = signature.GetBytes();
+
+            IOnBankServiceCallback callback = OperationContext.Current.GetCallbackChannel<IOnBankServiceCallback>();
+            RsaEngine eng = new RsaEngine();
+            eng.Init(false, _keyPair.Private);
+            var encoded = eng.ProcessBlock(data, 0, data.Length);
+
+            bool result = encoded.Length == sign.Length;
+            if (result)
+                for (int i = 0; i < encoded.Length; i++)
+                    if (encoded[i] != sign[i])
+                    {
+                        result = false;
+                        break;
+                    }
+            callback.onBankNoteValidate(banknote.Serial, signature, result);//*/
         }
 
         #region Validation
