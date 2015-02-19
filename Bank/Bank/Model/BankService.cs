@@ -1,99 +1,69 @@
-﻿using System;
+﻿using Bank.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Common;
+using Org.BouncyCastle.Math;
+using Bank.Data;
 using System.ServiceModel;
-using Bank.Interfaces;
 
 namespace Bank.Model
 {
-    using Interfaces;
-    using Org.BouncyCastle.Crypto.Parameters;
-
+    //proxy
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.PerSession)]
-    public class BankService : IBankService, IBankServiceProxyCallback
+    public class BankService : IBankService //per session 
     {
-        #region fields
+        private static IRepository<Guid, Banknote> _baknoteRepository = new BanknoteRepository();
+        private static IBanknoteFactory _banknoteFactory = new BanknoteFactory(_baknoteRepository);
 
-        private static IBanknoteRepository _repository = new BanknoteRepository();
-        private static IBanknoteFactory _factory = new BanknoteFactory(_repository);
+        private IBank _bank;
         private IBankServiceCallback _callback;
-        private BankServiceImpl _service;
-        private string sessionId = OperationContext.Current.SessionId;
-
-        #endregion
 
         public BankService()
         {
-            OperationContext.Current.InstanceContext.Closed += Cleanup;
             this._callback = OperationContext.Current.GetCallbackChannel<IBankServiceCallback>();
-            this._service = new BankServiceImpl(_factory, _repository, this, this);
+            this._bank = new Bank(_banknoteFactory, _baknoteRepository, this, _callback);
         }
 
-        public void doHandshake(int value)
+        public void doInit(Banknote aBanknote)
         {
-            _service.doHandshake(value);
+            _bank.doInit(aBanknote);
         }
 
-        public void doInitialize(string[] blindedBanknotes)
+        public void doCreateAgreement(string[] aBlindMessages)
         {
-            IList<byte[]> _blindedBanknoteList = new List<byte[]>(blindedBanknotes.Length);
-            for (int i = 0; i < blindedBanknotes.Length; i++)
-                _blindedBanknoteList.Add(blindedBanknotes[i].GetBytes());
-            _service.doInitialize(_blindedBanknoteList);
+            IList<byte[]> blindedMessages = new List<byte[]>(aBlindMessages.Length);
+            foreach (var item in aBlindMessages)
+                blindedMessages.Add(item.GetBytes());
+            _bank.doCreateAgreement(blindedMessages);
         }
 
-        public void doVerify(string[] banknotes, string[] secrets) { }
-
-        public void doValidate(string banknote, string signature)
+        public void doCreateSecret(PublicSecret aSecret)
         {
-            Banknote _banknote;
-            _banknote = banknote.FromXml<Banknote>();
-
-            byte[] _signature = signature.GetBytes();
-            _service.doValidate(_banknote, _signature);
+            _bank.doCreateSecret(aSecret);
         }
 
-        public void doFinalize() { }
-
-        private void Cleanup(object sender, EventArgs e)
+        public void doVerifySecret(PublicSecret aPublic, PrivateSecret aPrivate)
         {
-            OperationContext.Current.InstanceContext.Closed -= Cleanup;
+            _bank.doVerifySecret(aPublic, aPrivate);
         }
 
-        #region props
-
-        public readonly IBanknoteFactory Factory { get { return _factory; } }
-
-        public readonly IBanknoteRepository Repository { get { return _repository; } }
-
-        public readonly string SessionId { get { return sessionId; } }
-
-        #endregion
-
-
-        public void onHandshake(Banknote banknote, int banknoteCount, int idPerBanknoteCount, RsaKeyParameters publicKey)
+        public void doVerifyAgreement(PublicSecret[] aSecrets, string[] aBlindingFactors)
         {
-            _callback.onHandshake(banknote.ToXml(), banknoteCount, idPerBanknoteCount, publicKey.AsPublic());
+            if (aSecrets.Length != aBlindingFactors.Length)
+                return;
+            BigInteger[] factors = new BigInteger[aBlindingFactors.Length];
+            for (int i = 0; i < aSecrets.Length; i++)
+                factors[i] = new BigInteger(aBlindingFactors[i], 10);
+            _bank.doVerifyAgreement(aSecrets, factors);
         }
 
-        public void onInitialize(Banknote banknote, int excludeFromAgreement)
+        public void doFinalize()
         {
-            _callback.onInitialize(banknote.ToXml(), excludeFromAgreement);
+            _bank.doFinalize();
         }
 
-        public void onVerification(Banknote banknote, byte[] blindSignature)
-        {
-            _callback.onVerification(banknote.ToXml(), blindSignature.GetString());
-        }
-
-        public void onValidate(Banknote banknote, byte[] signature, bool result)
-        {
-            _callback.onValidate(banknote.ToXml(), signature.GetString(), result);
-        }
     }
-
-
 }

@@ -17,7 +17,14 @@ namespace Common
         {
             XmlSerializer deserializer = new XmlSerializer(typeof(T));
             TextReader textReader = new StringReader(str);
-            return (T) deserializer.Deserialize(textReader);
+            return (T)deserializer.Deserialize(textReader);
+        }
+
+        static public void FromXml<T>(this T e, string str)
+        {
+            XmlSerializer deserializer = new XmlSerializer(typeof(T));
+            TextReader textReader = new StringReader(str);
+            e = (T)deserializer.Deserialize(textReader);
         }
     }
 }
