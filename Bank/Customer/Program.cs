@@ -84,7 +84,6 @@ namespace Customer
         {
             try
             {
-                Bank.BankServiceClient service = new Bank.BankServiceClient(new InstanceContext(new BankCallbackHandler()));
                 Bank.BankNote banknote = new Bank.BankNote();
                 banknote.Serial = Guid.NewGuid();
                 banknote.Value = 9000;

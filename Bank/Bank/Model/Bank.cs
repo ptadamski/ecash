@@ -19,28 +19,24 @@ namespace Bank.Model
         private RsaKeyParameters _prv;
         //data
         private Banknote _banknote;    
-        private BlindAgreement _agreement;   
-        //repository                               
-        private IRepository<Guid, Banknote> _banknotes;
-        private IRepository<Guid, BlindAgreement> _agreements;
+        private BanknoteAgreement _agreement;   
+        //repository          
+        private Dictionary<Guid, Banknote> _banknotes;
+        private Dictionary<Guid, BanknoteAgreement> _agreements = new Dictionary<Guid, BanknoteAgreement>();
         private Dictionary<PublicSecret, PrivateSecret> _secrets = new Dictionary<PublicSecret, PrivateSecret>();
          
         //factory                  
-        private IBanknoteFactory _banknoteFactory;  
-        private IBlindAgreementFactory _agreementFactory;
+        //private IBanknoteFactory _banknoteFactory;  
+        //private IBlindAgreementFactory _agreementFactory;
         //callback                                         
         private IBankService _service;                     
-        private IBankServiceCallback _callback;       
+        private IBankServiceCallback _callback;
 
-        public Bank(IBanknoteFactory aBanknoteFactory, IRepository<Guid, Banknote> aBanknoteRepository, 
-            IBankService aService, IBankServiceCallback aCallback)
+        public Bank(Dictionary<Guid, Banknote> aBanknoteRepository, IBankService aService, IBankServiceCallback aCallback)
         {
             this._banknotes = aBanknoteRepository;
             this._service = aService;
-            this._banknoteFactory = aBanknoteFactory;
             this._callback = aCallback;
-            this._agreements = new BlindAgreementRepository();
-            this._agreementFactory = new BlindAgreementFactory(_agreements);
         }
 
         #region IBankCallback
@@ -76,15 +72,17 @@ namespace Bank.Model
 
         public void doInit(Banknote aBanknote)
         {
-            _banknote = _banknoteFactory.Construct(aBanknote.Value);
-            _banknotes.Add(_banknote.Serial, _banknote);
-            onInit(_banknote, BanknoteCount, _pub);
-        }
+            var serial = Guid.NewGuid();
+            while (_banknotes.ContainsKey(serial))
+                serial = Guid.NewGuid();
 
-        public void doCreateSecret(PublicSecret aSecret)
-        {
-            _secrets.Add(aSecret, null);
-            onCreateSecret(count);
+            _banknote = new Banknote();
+            _banknote.Serial = serial;
+            _banknote.Value = aBanknote.Value;
+
+            _banknotes.Add(_banknote.Serial, _banknote);
+
+            onInit(_banknote, BanknoteCount, _pub); //callback
         }
 
         public void doCreateAgreement(IList<byte[]> aBlindMessages)
@@ -92,52 +90,57 @@ namespace Bank.Model
             if (aBlindMessages.Count != BanknoteCount)
                 return;
 
-            foreach (var msg in aBlindMessages)
-                if (msg == null || msg.Length == 0)
-                    return;
-
-            _agreement = _agreementFactory.Construct(_banknote, aBlindMessages, _rand.Next);
-            onCreateAgreement(_agreement.Ignore);
+            _agreement = new BanknoteAgreement(_secrets);
+            _agreement.Init(aBlindMessages);
+            _agreements.Add(_banknote.Serial, _agreement);
+            _agreement.PickupForSignature(_rand.Next());
+            onCreateAgreement(_agreement.ForSignature); //callback
         }
 
         public void doVerifyAgreement(PublicSecret[] aSecrets, BigInteger[] aBlindingFactors)
         {
+            //(0) czy istnieje porozumienie w sprawie emisji banknotu
             if (_agreement == null)
                 return;
-            aSecrets[0].hash
 
-            //weryfikacja poprawnosci haszy
-            if (_agreement.Verify(aSecrets[0].hash, aBlindingFactors, _pub))
-            {
-                var signature = _agreement.Sign(_prv);
-                onVerify(_banknote, signature);
-            }
-            
-            //ustalanie poprawnosci danych
-            //powinien wyslac wczesniej hasze
+            //(1) czy wiadomosc pokrywa sie z zaslepiona wiadomoscia  
+            _agreement.Verify(aSecrets, aBlindingFactors, _pub);
+
+            //(2) czego skrotem jest wyslana wiadomosc 
+            //pominiete
+
+            var signature = _agreement.Sign(_prv);
+
+            onVerifyAgreement(aSecrets[_agreement.ForSignature], signature, signature != null);
+        }
+                          
+        public void doCreateSecret(PublicSecret aSecret)
+        {
+            _secrets.Add(aSecret, null); 
         }
 
         public void doVerifySecret(PublicSecret aPublic, PrivateSecret aPrivate)
-        {
-            onVerifySecret(IsValidSecret(aSecretId, aRandom2, aData));
-        }
+        {              
+            //albo przyjmuje aPrivate jako dane, albo pozostawia null w repo
+            //PrivateSecret item = null;
+            //_secrets.TryGetValue(aPublic, out item);
 
-        public bool IsValidSecret(PublicSecret aPublic, PrivateSecret aPrivate)
-        {
-            Secret item = _secrets[aSecretId];
-            Sha256Digest digester = new Sha256Digest();
-            var digestedBytes = new byte[digester.GetDigestSize()];
-            digester.BlockUpdate(item.Private.data, 0, item.Private.data.Length);
-            digester.BlockUpdate(item.Public.random1, 0, item.Public.random1.Length);
-            digester.BlockUpdate(item.Private.random2, 0, item.Private.random2.Length);
-            digester.DoFinal(digestedBytes, 0);
-            return digestedBytes.IsEqual(item.Public.hash);
-        }
+            //Sha256Digest digester = new Sha256Digest();
+            //var digestedBytes = new byte[digester.GetDigestSize()];
 
+            //var d = item.data.GetBytes();
+            //var r1 = aPublic.random1.ToByteArray();
+            //var r2 = item.random2.ToByteArray(); 
+
+            //digester.BlockUpdate(d, 0, d.Length);
+            //digester.BlockUpdate(r1, 0, r1.Length);
+            //digester.BlockUpdate(r2, 0, r2.Length);
+            //digester.DoFinal(digestedBytes, 0);
+            //return digestedBytes.IsEqual(item.Public.hash.GetBytes());
+        }
 
         public void doFinalize()
         {
-            throw new NotImplementedException();
         }
 
         #endregion

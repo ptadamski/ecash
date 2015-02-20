@@ -15,8 +15,8 @@ namespace Bank.Model
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.PerSession)]
     public class BankService : IBankService //per session 
     {
-        private static IRepository<Guid, Banknote> _baknoteRepository = new BanknoteRepository();
-        private static IBanknoteFactory _banknoteFactory = new BanknoteFactory(_baknoteRepository);
+        private static Dictionary<Guid, Banknote> _baknoteRepository = new Dictionary<Guid, Banknote>();
+        //private static IBanknoteFactory _banknoteFactory = new BanknoteFactory(_baknoteRepository);
 
         private IBank _bank;
         private IBankServiceCallback _callback;
@@ -24,7 +24,7 @@ namespace Bank.Model
         public BankService()
         {
             this._callback = OperationContext.Current.GetCallbackChannel<IBankServiceCallback>();
-            this._bank = new Bank(_banknoteFactory, _baknoteRepository, this, _callback);
+            this._bank = new Bank(_baknoteRepository, this, _callback);
         }
 
         public void doInit(Banknote aBanknote)
@@ -59,11 +59,5 @@ namespace Bank.Model
                 factors[i] = new BigInteger(aBlindingFactors[i], 10);
             _bank.doVerifyAgreement(aSecrets, factors);
         }
-
-        public void doFinalize()
-        {
-            _bank.doFinalize();
-        }
-
     }
 }

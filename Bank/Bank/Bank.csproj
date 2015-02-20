@@ -44,18 +44,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Banknote.cs" />
-    <Compile Include="Interface\Factory\IBlindAgreementFactory.cs" />
-    <Compile Include="Interface\Factory\IFactory.cs" />
     <Compile Include="Interface\Repository\IRepository.cs" />
-    <Compile Include="Model\Factory\BanknoteFactory.cs" />
-    <Compile Include="Model\Repository\BanknoteRepository.cs" />
     <Compile Include="Model\Bank.cs" />
     <Compile Include="Interface\IBankService.cs" />
-    <Compile Include="Interface\Factory\IBanknoteFactory.cs" />
     <Compile Include="Data\BlindAgreement.cs" />
     <Compile Include="Model\BankService.cs" />
-    <Compile Include="Model\Factory\BlindAgreementFactory.cs" />
-    <Compile Include="Model\Repository\BlindAgreementRepository.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

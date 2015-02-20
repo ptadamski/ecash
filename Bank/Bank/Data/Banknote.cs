@@ -3,7 +3,17 @@ using System;
 using System.Runtime.Serialization;
 
 namespace Bank.Data
-{          
+{
+    [DataContract()]
+    public class Identity
+    {
+        [DataMember()]
+        public PublicSecret[] LeftId { get; set; }
+
+        [DataMember()]
+        public PublicSecret[] RightId { get; set; }
+    }
+
     [DataContract()]
     public class Banknote
     {
@@ -14,9 +24,6 @@ namespace Bank.Data
         public int Value { get; set; }
 
         [DataMember()]
-        public PublicSecret LeftId { get; set; }
-
-        [DataMember()]
-        public PublicSecret RightId { get; set; }
+        public Identity Id { get; set; }
     }
 }

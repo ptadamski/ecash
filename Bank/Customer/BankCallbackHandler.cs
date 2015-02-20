@@ -75,8 +75,6 @@ namespace Customer
                     byte[] digestedInput = new byte[digester.GetByteLength()];
                     digester.DoFinal(digestedInput, 0);
                     digester.Reset();
-
-                    idseq.Hash = 
                 }
 			}
 
