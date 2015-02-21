@@ -6,6 +6,7 @@ using System.ServiceModel;
 using System.ServiceModel.Description;
 using System.Text;
 using System.Threading.Tasks;
+using Common;
 
 namespace Bank
 {
@@ -15,6 +16,13 @@ namespace Bank
         {
             try
             {
+                                                                                   
+                System.IO.StreamReader prv = new System.IO.StreamReader("rsa.prv");
+                Bank.Model.Bank.PrivateKey = prv.ReadToEnd().ToRsaPrivateKey();
+
+                System.IO.StreamReader pub = new System.IO.StreamReader("rsa.pub");  
+                Bank.Model.Bank.PublicKey = pub.ReadToEnd().ToRsaPublicKey();
+
                 ServiceHost host = new ServiceHost(typeof(BankService));
                 host.Open();
                 foreach (var item in host.BaseAddresses)

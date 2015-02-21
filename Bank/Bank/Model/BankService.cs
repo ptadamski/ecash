@@ -56,7 +56,7 @@ namespace Bank.Model
                 return;
             BigInteger[] factors = new BigInteger[aBlindingFactors.Length];
             for (int i = 0; i < aSecrets.Length; i++)
-                factors[i] = new BigInteger(aBlindingFactors[i], 10);
+                factors[i] = new BigInteger(aBlindingFactors[i], 16);
             _bank.doVerifyAgreement(aSecrets, factors);
         }
     }

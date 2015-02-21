@@ -2,19 +2,17 @@ using Common;
 using System;
 using System.Runtime.Serialization;
 
-namespace Bank.Data
+namespace Common
 {
-    [DataContract()]
     public class Identity
     {
         [DataMember()]
-        public PublicSecret[] LeftId { get; set; }
+        public PublicSecret LeftId { get; set; }
 
         [DataMember()]
-        public PublicSecret[] RightId { get; set; }
+        public PublicSecret RightId { get; set; }
     }
 
-    [DataContract()]
     public class Banknote
     {
         [DataMember()]
@@ -24,6 +22,6 @@ namespace Bank.Data
         public int Value { get; set; }
 
         [DataMember()]
-        public Identity Id { get; set; }
+        public Identity[] UserId { get; set; }
     }
 }

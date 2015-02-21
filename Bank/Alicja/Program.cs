@@ -3,6 +3,7 @@ using Org.BouncyCastle.Crypto.Digests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,8 +13,19 @@ namespace Alicja
     {
         static void Main(string[] args)
         {
-            PublicSecret pub = new PublicSecret();
+            var callback = new BankServiceCallback();
+            var callbackInstance = new InstanceContext(callback);
+            var service = new BankService.BankServiceClient(callbackInstance);
+            callback.Service = service;
 
+            var banknote = new Banknote();
+            banknote.Value = 30;
+            service.doInit(banknote);
+            Console.ReadLine();
+
+
+            /*
+            PublicSecret pub = new PublicSecret
             Sha256Digest digester = new Sha256Digest();
             byte[] digest = new byte[digester.GetDigestSize()];
             byte[] data = "some string".GetBytes();
@@ -25,7 +37,7 @@ namespace Alicja
 
             System.IO.StreamWriter sw = new System.IO.StreamWriter("somexml.xml");
             sw.Write(pub.ToXml());
-            sw.Close();
+            sw.Close();  */
         }
     }
 }

@@ -1,12 +1,15 @@
-﻿using System;
+﻿using Org.BouncyCastle.Crypto;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Common
 {
-    public class PublicSecret  : IEqualityComparer<PublicSecret>
+    [DataContract()]
+    public class PublicSecret : IEqualityComparer<PublicSecret>
     {
         public PublicSecret(string hash, Guid random1)
         {
@@ -16,11 +19,15 @@ namespace Common
 
         public PublicSecret()
         {
+
         }
 
+        [DataMember()]
         public string hash;
+
+        [DataMember()]
         public Guid random1;
-    
+
         public bool Equals(PublicSecret x, PublicSecret y)
         {
             return x.hash.Equals(y.hash) && x.random1.Equals(y.random1);
@@ -30,8 +37,9 @@ namespace Common
         {
             return hash.GetHashCode() ^ random1.GetHashCode();
         }
-}
+    }
 
+    [DataContract()]
     public class PrivateSecret
     {
         public PrivateSecret(string data, Guid random2)
@@ -42,28 +50,36 @@ namespace Common
 
         public PrivateSecret()
         {
+
         }
 
+        [DataMember()]
         public Guid random2;
+
+        [DataMember()]
         public string data;
     }
 
+    [DataContract()]
     public class Secret
     {
-        public Secret(string hash, Guid random1)
+        public Secret(byte[] aData, IDigest aDigester)
         {
-            this._public = new PublicSecret(hash, random1);
-            this._private = new PrivateSecret();
-        }
-
-        public Secret(string hash, Guid random1, Guid random2, string data)
-        {
-            this._public = new PublicSecret(hash, random1);
-            this._private = new PrivateSecret(data, random2);
+            var r1 = Guid.NewGuid();
+            var r2 = Guid.NewGuid();
+            var digested = new byte[aDigester.GetByteLength()];
+            aDigester.Reset();
+            aDigester.BlockUpdate(aData, 0, aData.Length);
+            aDigester.BlockUpdate(r1.ToByteArray(), 0, r1.ToByteArray().Length);
+            aDigester.BlockUpdate(r2.ToByteArray(), 0, r2.ToByteArray().Length);
+            aDigester.DoFinal(digested, 0);
+            Public = new PublicSecret(digested.GetString(), r1);
+            Private = new PrivateSecret(aData.GetString(), r2);
         }
 
         private PrivateSecret _private;
 
+        [DataMember()]
         public PrivateSecret Private
         {
             get { return _private; }
@@ -71,7 +87,8 @@ namespace Common
         }
 
         private PublicSecret _public;
-
+                    
+        [DataMember()]
         public PublicSecret Public
         {
             get { return _public; }

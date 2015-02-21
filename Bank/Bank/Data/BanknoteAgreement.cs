@@ -59,6 +59,7 @@ namespace Bank.Data
 
                 RsaBlindingParameters param = new RsaBlindingParameters(aPublicKey, aFactorList[i]);
                 eng.Init(true, param);
+
                 var digest = aSecrets[i].hash.GetBytes();
                 var data = eng.ProcessBlock(digest, 0, digest.Length);
 
@@ -90,6 +91,7 @@ namespace Bank.Data
             }               */
 
             _status = AgreementStatus.Good;
+
 
         }
               

@@ -9,154 +9,14 @@
 //------------------------------------------------------------------------------
 
 namespace Alicja.BankService {
-    using System.Runtime.Serialization;
-    using System;
     
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Banknote", Namespace="http://schemas.datacontract.org/2004/07/Bank.Data")]
-    [System.SerializableAttribute()]
-    public partial class Banknote : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Alicja.BankService.Identity IdField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Guid SerialField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int ValueField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public Alicja.BankService.Identity Id {
-            get {
-                return this.IdField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.IdField, value) != true)) {
-                    this.IdField = value;
-                    this.RaisePropertyChanged("Id");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Guid Serial {
-            get {
-                return this.SerialField;
-            }
-            set {
-                if ((this.SerialField.Equals(value) != true)) {
-                    this.SerialField = value;
-                    this.RaisePropertyChanged("Serial");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int Value {
-            get {
-                return this.ValueField;
-            }
-            set {
-                if ((this.ValueField.Equals(value) != true)) {
-                    this.ValueField = value;
-                    this.RaisePropertyChanged("Value");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Identity", Namespace="http://schemas.datacontract.org/2004/07/Bank.Data")]
-    [System.SerializableAttribute()]
-    public partial class Identity : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Common.PublicSecret[] LeftIdField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Common.PublicSecret[] RightIdField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public Common.PublicSecret[] LeftId {
-            get {
-                return this.LeftIdField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.LeftIdField, value) != true)) {
-                    this.LeftIdField = value;
-                    this.RaisePropertyChanged("LeftId");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public Common.PublicSecret[] RightId {
-            get {
-                return this.RightIdField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.RightIdField, value) != true)) {
-                    this.RightIdField = value;
-                    this.RaisePropertyChanged("RightId");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="BankService.IBankService", CallbackContract=typeof(Alicja.BankService.IBankServiceCallback))]
     public interface IBankService {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/doInit")]
-        void doInit(Alicja.BankService.Banknote aBanknote);
+        void doInit(Common.Banknote aBanknote);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/doCreateAgreement")]
         void doCreateAgreement(string[] aBlindMessages);
@@ -175,13 +35,13 @@ namespace Alicja.BankService {
     public interface IBankServiceCallback {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/onInit")]
-        void onInit(Alicja.BankService.Banknote aBanknote, int aBanknoteCount, string aPublicKey);
+        void onInit(Common.Banknote aBanknote, int aBanknoteCount, string aPublicKey);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/onCreateAgreement")]
         void onCreateAgreement(int aIndex);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/onVerifyAgreement")]
-        void onVerifyAgreement(Common.PublicSecret aBanknote, string aSignature, bool aAgreed);
+        void onVerifyAgreement(Common.PublicSecret aBanknote, string aBlindSignature, bool aAgreed);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/doUncoverSecret")]
         void doUncoverSecret(Common.PublicSecret aSecret);
@@ -218,7 +78,7 @@ namespace Alicja.BankService {
                 base(callbackInstance, binding, remoteAddress) {
         }
         
-        public void doInit(Alicja.BankService.Banknote aBanknote) {
+        public void doInit(Common.Banknote aBanknote) {
             base.Channel.doInit(aBanknote);
         }
         

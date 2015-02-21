@@ -10,12 +10,12 @@ namespace Common
     {
         static public string GetString(this byte[] data)
         {
-            return Encoding.UTF8.GetString(data);
+            return Encoding.Default.GetString(data);
         }
 
         static public byte[] GetBytes(this string data)
         {
-            return Encoding.UTF8.GetBytes(data);
+            return Encoding.Default.GetBytes(data);
         }
     }
 }

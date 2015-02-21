@@ -36,7 +36,7 @@ namespace Bank.Interface
         void onCreateAgreement(int aIndex);
 
         [OperationContract(IsOneWay = true)]
-        void onVerifyAgreement(PublicSecret aBanknote, string aSignature, bool aAgreed);
+        void onVerifyAgreement(PublicSecret aBanknote, string aBlindSignature, bool aAgreed);
 
         [OperationContract(IsOneWay = true)]
         void doUncoverSecret(PublicSecret aSecret);
@@ -58,7 +58,7 @@ namespace Bank.Interface
     {
         void onInit(Banknote aBanknote, int aBanknoteCount, RsaKeyParameters aPublicKey);
         void onCreateAgreement(int aIndex);
-        void onVerifyAgreement(PublicSecret aBanknote, byte[] aSignature, bool aAgreed);
+        void onVerifyAgreement(PublicSecret aBanknote, byte[] aBlindSignature, bool aAgreed);
         void doUncoverSecret(PublicSecret aSecret);
         void onVerifySecret(PublicSecret aSecret, bool aAgreed);
     }

@@ -43,11 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\Banknote.cs" />
-    <Compile Include="Interface\Repository\IRepository.cs" />
     <Compile Include="Model\Bank.cs" />
     <Compile Include="Interface\IBankService.cs" />
-    <Compile Include="Data\BlindAgreement.cs" />
+    <Compile Include="Data\BanknoteAgreement.cs" />
     <Compile Include="Model\BankService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -56,9 +54,6 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\lib\bccrypto-net-1.7-src-ext\csharp\crypto\crypto.csproj">

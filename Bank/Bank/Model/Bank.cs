@@ -14,9 +14,9 @@ namespace Bank.Model
     public class Bank : IBank, IBankCallback
     {                                           
         private static int BanknoteCount = 100;  
-        private static Random _rand = new Random();  
-        private RsaKeyParameters _pub; 
-        private RsaKeyParameters _prv;
+        private static Random _rand = new Random();
+        private static RsaKeyParameters _pub; 
+        private static RsaKeyParameters _prv;
         //data
         private Banknote _banknote;    
         private BanknoteAgreement _agreement;   
@@ -56,9 +56,9 @@ namespace Bank.Model
             _callback.doUncoverSecret(aSecret);
         }
 
-        public void onVerifyAgreement(PublicSecret aBanknote, byte[] aSignature, bool aAgreed)
+        public void onVerifyAgreement(PublicSecret aBanknote, byte[] aBlindSignature, bool aAgreed)
         {
-            _callback.onVerifyAgreement(aBanknote, aSignature.GetString(), aAgreed);
+            _callback.onVerifyAgreement(aBanknote, aBlindSignature.GetString(), aAgreed);
         }
 
         public void onVerifySecret(PublicSecret aSecret, bool aAgreed)
@@ -76,13 +76,19 @@ namespace Bank.Model
             while (_banknotes.ContainsKey(serial))
                 serial = Guid.NewGuid();
 
+
             _banknote = new Banknote();
             _banknote.Serial = serial;
             _banknote.Value = aBanknote.Value;
-
+                                                   
             _banknotes.Add(_banknote.Serial, _banknote);
+                                                         
+            Console.WriteLine(_banknote.Serial);
+            Console.WriteLine(_banknote.Value);
 
-            onInit(_banknote, BanknoteCount, _pub); //callback
+            Console.WriteLine("try callback");
+            onInit(_banknote, BanknoteCount, _pub); //callback    
+            Console.WriteLine("end callback");
         }
 
         public void doCreateAgreement(IList<byte[]> aBlindMessages)
@@ -93,7 +99,7 @@ namespace Bank.Model
             _agreement = new BanknoteAgreement(_secrets);
             _agreement.Init(aBlindMessages);
             _agreements.Add(_banknote.Serial, _agreement);
-            _agreement.PickupForSignature(_rand.Next());
+            _agreement.PickupForSignature(_rand.Next(0, BanknoteCount));
             onCreateAgreement(_agreement.ForSignature); //callback
         }
 
@@ -139,19 +145,15 @@ namespace Bank.Model
             //return digestedBytes.IsEqual(item.Public.hash.GetBytes());
         }
 
-        public void doFinalize()
-        {
-        }
-
         #endregion
 
-        public RsaKeyParameters PublicKey
+        public static RsaKeyParameters PublicKey
         {
             get { return _pub; }
             set { _pub = value; }
         }
 
-        public RsaKeyParameters PrivateKey
+        public static RsaKeyParameters PrivateKey
         {
             get { return _prv; }
             set { _prv = value; }

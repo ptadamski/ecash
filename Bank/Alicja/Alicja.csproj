@@ -57,9 +57,6 @@
     <None Include="Service References\BankService\Arrays.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\BankService\Bank.Data.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Service References\BankService\Common.xsd">
       <SubType>Designer</SubType>
     </None>

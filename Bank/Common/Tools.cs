@@ -21,7 +21,7 @@ namespace Common
             return Convert.ToBase64String(serializedPublicBytes);
         }
 
-        public static RsaKeyParameters ToPublicRsaKeyParameter(this string str)
+        public static RsaKeyParameters ToRsaPublicKey(this string str)
         {
             return (RsaKeyParameters)PublicKeyFactory.CreateKey(Convert.FromBase64String(str));
         }
@@ -33,7 +33,7 @@ namespace Common
             return Convert.ToBase64String(serializedPrivateBytes);
         }
 
-        public static RsaKeyParameters ToPrivateRsaKeyParameter(string str)
+        public static RsaKeyParameters ToRsaPrivateKey(this string str)
         {
             return (RsaPrivateCrtKeyParameters)PrivateKeyFactory.CreateKey(Convert.FromBase64String(str));
         }

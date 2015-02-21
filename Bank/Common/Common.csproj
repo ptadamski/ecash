@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsymmetricCipherStream.cs" />
+    <Compile Include="Banknote.cs" />
     <Compile Include="Secret.cs" />
     <Compile Include="StaEqCmp.cs" />
     <Compile Include="Tools.cs" />
