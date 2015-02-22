@@ -6,6 +6,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/Common" minOccurs="0" name="aBanknote" nillable="true" type="q1:Banknote" />
+        <xs:element minOccurs="0" name="aUnderCreation" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -24,18 +25,13 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="doCreateSecret">
+  <xs:element name="doDepone">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/Common" minOccurs="0" name="aSecret" nillable="true" type="q5:PublicSecret" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="doVerifySecret">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/Common" minOccurs="0" name="aPublic" nillable="true" type="q6:PublicSecret" />
-        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/Common" minOccurs="0" name="aPrivate" nillable="true" type="q7:PrivateSecret" />
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/Common" minOccurs="0" name="aBanknote" nillable="true" type="q5:Secret" />
+        <xs:element minOccurs="0" name="aSignature" nillable="true" type="xs:string" />
+        <xs:element xmlns:q6="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="aIdIndexList" nillable="true" type="q6:ArrayOfint" />
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/Common" minOccurs="0" name="aPartialIdList" nillable="true" type="q7:ArrayOfPrivateSecret" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -60,21 +56,6 @@
       <xs:sequence>
         <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/Common" minOccurs="0" name="aBanknote" nillable="true" type="q9:PublicSecret" />
         <xs:element minOccurs="0" name="aBlindSignature" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="aAgreed" type="xs:boolean" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="doUncoverSecret">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/Common" minOccurs="0" name="aSecret" nillable="true" type="q10:PublicSecret" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="onVerifySecret">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/Common" minOccurs="0" name="aSecret" nillable="true" type="q11:PublicSecret" />
         <xs:element minOccurs="0" name="aAgreed" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>

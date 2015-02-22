@@ -27,11 +27,8 @@
   <wsdl:message name="IBankService_doVerifyAgreement_InputMessage">
     <wsdl:part name="parameters" element="tns:doVerifyAgreement" />
   </wsdl:message>
-  <wsdl:message name="IBankService_doCreateSecret_InputMessage">
-    <wsdl:part name="parameters" element="tns:doCreateSecret" />
-  </wsdl:message>
-  <wsdl:message name="IBankService_doVerifySecret_InputMessage">
-    <wsdl:part name="parameters" element="tns:doVerifySecret" />
+  <wsdl:message name="IBankService_doDepone_InputMessage">
+    <wsdl:part name="parameters" element="tns:doDepone" />
   </wsdl:message>
   <wsdl:message name="IBankService_onInit_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:onInit" />
@@ -41,12 +38,6 @@
   </wsdl:message>
   <wsdl:message name="IBankService_onVerifyAgreement_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:onVerifyAgreement" />
-  </wsdl:message>
-  <wsdl:message name="IBankService_doUncoverSecret_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:doUncoverSecret" />
-  </wsdl:message>
-  <wsdl:message name="IBankService_onVerifySecret_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:onVerifySecret" />
   </wsdl:message>
   <wsdl:portType name="IBankService">
     <wsdl:operation name="doInit">
@@ -58,11 +49,8 @@
     <wsdl:operation name="doVerifyAgreement">
       <wsdl:input wsaw:Action="http://tempuri.org/IBankService/doVerifyAgreement" message="tns:IBankService_doVerifyAgreement_InputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="doCreateSecret">
-      <wsdl:input wsaw:Action="http://tempuri.org/IBankService/doCreateSecret" message="tns:IBankService_doCreateSecret_InputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="doVerifySecret">
-      <wsdl:input wsaw:Action="http://tempuri.org/IBankService/doVerifySecret" message="tns:IBankService_doVerifySecret_InputMessage" />
+    <wsdl:operation name="doDepone">
+      <wsdl:input wsaw:Action="http://tempuri.org/IBankService/doDepone" message="tns:IBankService_doDepone_InputMessage" />
     </wsdl:operation>
     <wsdl:operation name="onInit">
       <wsdl:output wsaw:Action="http://tempuri.org/IBankService/onInit" message="tns:IBankService_onInit_OutputCallbackMessage" />
@@ -72,12 +60,6 @@
     </wsdl:operation>
     <wsdl:operation name="onVerifyAgreement">
       <wsdl:output wsaw:Action="http://tempuri.org/IBankService/onVerifyAgreement" message="tns:IBankService_onVerifyAgreement_OutputCallbackMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="doUncoverSecret">
-      <wsdl:output wsaw:Action="http://tempuri.org/IBankService/doUncoverSecret" message="tns:IBankService_doUncoverSecret_OutputCallbackMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="onVerifySecret">
-      <wsdl:output wsaw:Action="http://tempuri.org/IBankService/onVerifySecret" message="tns:IBankService_onVerifySecret_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="NetTcpBinding_IBankService" type="tns:IBankService">
@@ -102,14 +84,8 @@
         <soap12:body use="literal" />
       </wsdl:input>
     </wsdl:operation>
-    <wsdl:operation name="doCreateSecret">
-      <soap12:operation soapAction="http://tempuri.org/IBankService/doCreateSecret" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-    </wsdl:operation>
-    <wsdl:operation name="doVerifySecret">
-      <soap12:operation soapAction="http://tempuri.org/IBankService/doVerifySecret" style="document" />
+    <wsdl:operation name="doDepone">
+      <soap12:operation soapAction="http://tempuri.org/IBankService/doDepone" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -128,18 +104,6 @@
     </wsdl:operation>
     <wsdl:operation name="onVerifyAgreement">
       <soap12:operation soapAction="http://tempuri.org/IBankService/onVerifyAgreement" style="document" />
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="doUncoverSecret">
-      <soap12:operation soapAction="http://tempuri.org/IBankService/doUncoverSecret" style="document" />
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="onVerifySecret">
-      <soap12:operation soapAction="http://tempuri.org/IBankService/onVerifySecret" style="document" />
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>

@@ -15,8 +15,7 @@ namespace Bank.Model
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.PerSession)]
     public class BankService : IBankService //per session 
     {
-        private static Dictionary<Guid, Banknote> _baknoteRepository = new Dictionary<Guid, Banknote>();
-        //private static IBanknoteFactory _banknoteFactory = new BanknoteFactory(_baknoteRepository);
+        private static BanknoteRepository _baknoteRepository = new BanknoteRepository();
 
         private IBank _bank;
         private IBankServiceCallback _callback;
@@ -27,9 +26,9 @@ namespace Bank.Model
             this._bank = new Bank(_baknoteRepository, this, _callback);
         }
 
-        public void doInit(Banknote aBanknote)
+        public void doInit(Banknote aBanknote, bool aUnderCreation)
         {
-            _bank.doInit(aBanknote);
+            _bank.doInit(aBanknote, aUnderCreation);
         }
 
         public void doCreateAgreement(string[] aBlindMessages)
@@ -40,16 +39,6 @@ namespace Bank.Model
             _bank.doCreateAgreement(blindedMessages);
         }
 
-        public void doCreateSecret(PublicSecret aSecret)
-        {
-            _bank.doCreateSecret(aSecret);
-        }
-
-        public void doVerifySecret(PublicSecret aPublic, PrivateSecret aPrivate)
-        {
-            _bank.doVerifySecret(aPublic, aPrivate);
-        }
-
         public void doVerifyAgreement(PublicSecret[] aSecrets, string[] aBlindingFactors)
         {
             if (aSecrets.Length != aBlindingFactors.Length)
@@ -58,6 +47,11 @@ namespace Bank.Model
             for (int i = 0; i < aSecrets.Length; i++)
                 factors[i] = new BigInteger(aBlindingFactors[i], 16);
             _bank.doVerifyAgreement(aSecrets, factors);
+        }
+
+        public void doDepone(Secret aBanknote, string aSignature, int[] aIdIndexList, PrivateSecret[] aPartialIdList)
+        {
+            _bank.doDepone(aBanknote, aSignature.GetBytes(), aIdIndexList, aPartialIdList);
         }
     }
 }

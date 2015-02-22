@@ -40,7 +40,7 @@ namespace Common
 
     }
 
-    public struct BanknoteConstants
+    public struct BankConstants
     {
         public const int IDSEQ_COUNT = 100;
         public const int BANKNOTE_COUNT = 100;

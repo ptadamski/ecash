@@ -18,6 +18,20 @@ namespace Common
             return result;
         }
 
+        static public Guid Xor(this Guid x, Guid y)
+        {
+            return new Guid(Xor(x.ToByteArray(), y.ToByteArray()));
+        }
+
+        static public byte[] Xor(this byte[] x, byte[] y)
+        {
+            if (x.Length != y.Length)
+                return null;
+            byte[] z = new byte[x.Length];
+            for (int i = 0; i < z.Length; i++)
+                z[i] = (byte)(x[i] ^ y[i]);
+            return z;
+        }
 
         static public bool IsEqual(this byte[] obj, byte[] other)
         {

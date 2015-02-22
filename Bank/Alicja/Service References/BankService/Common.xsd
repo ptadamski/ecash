@@ -17,11 +17,16 @@
   <xs:element name="ArrayOfIdentity" nillable="true" type="tns:ArrayOfIdentity" />
   <xs:complexType name="Identity">
     <xs:sequence>
-      <xs:element minOccurs="0" name="LeftId" nillable="true" type="tns:PublicSecret" />
-      <xs:element minOccurs="0" name="RightId" nillable="true" type="tns:PublicSecret" />
+      <xs:element minOccurs="0" name="PartialId" nillable="true" type="tns:ArrayOfPublicSecret" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Identity" nillable="true" type="tns:Identity" />
+  <xs:complexType name="ArrayOfPublicSecret">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PublicSecret" nillable="true" type="tns:PublicSecret" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPublicSecret" nillable="true" type="tns:ArrayOfPublicSecret" />
   <xs:complexType name="PublicSecret">
     <xs:sequence>
       <xs:element minOccurs="0" name="hash" nillable="true" type="xs:string" />
@@ -29,12 +34,13 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="PublicSecret" nillable="true" type="tns:PublicSecret" />
-  <xs:complexType name="ArrayOfPublicSecret">
+  <xs:complexType name="Secret">
     <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="PublicSecret" nillable="true" type="tns:PublicSecret" />
+      <xs:element minOccurs="0" name="Private" nillable="true" type="tns:PrivateSecret" />
+      <xs:element minOccurs="0" name="Public" nillable="true" type="tns:PublicSecret" />
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="ArrayOfPublicSecret" nillable="true" type="tns:ArrayOfPublicSecret" />
+  <xs:element name="Secret" nillable="true" type="tns:Secret" />
   <xs:complexType name="PrivateSecret">
     <xs:sequence>
       <xs:element minOccurs="0" name="data" nillable="true" type="xs:string" />
@@ -42,4 +48,10 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="PrivateSecret" nillable="true" type="tns:PrivateSecret" />
+  <xs:complexType name="ArrayOfPrivateSecret">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PrivateSecret" nillable="true" type="tns:PrivateSecret" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPrivateSecret" nillable="true" type="tns:ArrayOfPrivateSecret" />
 </xs:schema>

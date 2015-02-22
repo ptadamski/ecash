@@ -16,8 +16,7 @@ namespace Alicja
 {
     public class BankServiceCallback : BankService.IBankServiceCallback
     {
-        private byte[] Identity = Guid.NewGuid().ToByteArray();
-        private const int IdentityCount = 100;
+        private Guid _identity = Guid.NewGuid();
         RsaKeyParameters _publicKey;
 
         private IBankService _service;
@@ -29,27 +28,39 @@ namespace Alicja
         }
 
 
-              
-        static Guid Xor(Guid x, Guid y)
+        public class IdentitySplitter
         {
-            return new Guid(Xor(x.ToByteArray(), y.ToByteArray()));
-        }
+            public IdentitySplitter(Guid aId, int aParts)
+            {
+                this.parts = new Guid[aParts];
 
-        static byte[] Xor(byte[] x, byte[] y)
-        {
-            if (x.Length!=y.Length)
-                return null;
-            byte[] z = new byte[x.Length];
-            for (int i = 0; i < z.Length; i++)
-                z[i] = (byte)(x[i] ^ y[i]);
-            return z;
+                Guid id = new Guid();                    
+                for (int i = 1; i < aParts; i++) 
+                {
+                    parts[i] = Guid.NewGuid();
+                    id = id.Xor(parts[i]);  
+                }
+
+                if (aParts>0)
+                    parts[0] = id.Xor(aId);
+            }
+
+            private Guid[] parts;
+
+            public Guid[] Parts
+            {
+                get { return parts; }
+                set { parts = value; }
+            }
+
         }
 
         public class BanknoteAgreement
         {
             public Banknote Banknote { get; set; }
-            public PrivateSecret[] L_UserId { get; set; }
-            public PrivateSecret[] R_UserId { get; set; }  
+            public Secret[][] Identities { get; set; }
+           // public PrivateSecret[] L_UserId { get; set; }
+           // public PrivateSecret[] R_UserId { get; set; }  
             public BigInteger BlindingFactor { get; set; }                          
             public Secret BanknoteHash { get; set; }
         }
@@ -61,43 +72,39 @@ namespace Alicja
         }
 
         Agreement _agreement = null;
-        Dictionary<Guid, KeyValuePair<Banknote, string>> _banknotes = new Dictionary<Guid, KeyValuePair<Banknote, string>>();
 
         public void onInit(Banknote aBanknote, int aBanknoteCount, string aPublicKey)
         {
             _agreement = new Agreement();
             _agreement.Banknotes = new BanknoteAgreement[aBanknoteCount];
 
+            int MaxIdentityCount = aBanknote.UserId.Length;
+            int MaxSubIdentityCount = 2;
+                                
             //generowanie banknotow
-            List<Banknote> banknotes = new List<Banknote>(aBanknoteCount); 
             Sha256Digest digester = new Sha256Digest();
-            for (int i = 0; i < aBanknoteCount; i++) //dla kazdego banknotu
-            {                                            
-                var banknote = new Banknote();
-                banknote.Serial = aBanknote.Serial;
-                banknote.Value = aBanknote.Value;
-                banknote.UserId = new Identity[IdentityCount]; 
-                _agreement.Banknotes[i] = new BanknoteAgreement();  
-                _agreement.Banknotes[i].Banknote = banknote;           
-                   _agreement.Banknotes[i].R_UserId = new PrivateSecret[IdentityCount];      
-                    _agreement.Banknotes[i].L_UserId = new PrivateSecret[IdentityCount];
-                //generowanie ciagow identyfikacyjnych 
-                for (int j = 0; j < IdentityCount; j++) //dla kazdego ciagu identyfikacyjnego w banknocie
-                {
-                    var right = Guid.NewGuid().ToByteArray();   
-                    var left = Xor(right, Identity);   
-                                                                    
-                    Secret r_userId = new Secret(right, digester);
-                    Secret l_userId = new Secret(left, digester);
-                                                             
-                    banknote.UserId[j] = new Identity(); 
-                    banknote.UserId[j].RightId = r_userId.Public;    
-                    banknote.UserId[j].LeftId = l_userId.Public;
+            List<Banknote> banknotes = new List<Banknote>(aBanknoteCount);
 
-                    _agreement.Banknotes[i].R_UserId[j] = r_userId.Private;
-                    _agreement.Banknotes[i].L_UserId[j] = r_userId.Private;
+            for (int i = 0; i < aBanknoteCount; i++) //dla kazdego banknotu
+            {
+                var banknote = new Banknote() { Serial = aBanknote.Serial, Value = aBanknote.Value, UserId = new Identity[aBanknote.UserId.Length] };
+
+                _agreement.Banknotes[i] = new BanknoteAgreement() { Banknote = banknote, Identities = new Secret[MaxIdentityCount][] };
+
+                //generowanie ciagow identyfikacyjnych 
+                for (int j = 0; j < MaxIdentityCount; j++) //dla kazdego ciagu identyfikacyjnego w banknocie
+                {                            
+                    banknote.UserId[j] = new Identity();
+                    _agreement.Banknotes[i].Identities[j] = new Secret[MaxSubIdentityCount];
+                    IdentitySplitter ident = new IdentitySplitter(_identity, MaxSubIdentityCount);
+                    for (int k = 0; k < MaxSubIdentityCount; k++)
+                    {
+                        _agreement.Banknotes[i].Identities[j][k] = new Secret(ident.Parts[k].ToByteArray(), digester);   
+                        banknote.UserId[j].PartialId = new PublicSecret[MaxSubIdentityCount];
+                        banknote.UserId[j].PartialId[k] = _agreement.Banknotes[i].Identities[j][k].Public;
+                    }
                 }
-            }
+            }      //*/
 
             //generowanie skrotow banknotow
             List<byte[]> digestedBanknoteList = new List<byte[]>(aBanknoteCount);

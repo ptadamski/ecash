@@ -20,7 +20,7 @@ namespace Alicja
 
             var banknote = new Banknote();
             banknote.Value = 30;
-            service.doInit(banknote);
+            service.doInit(banknote,true);
             Console.ReadLine();
 
 

@@ -74,7 +74,21 @@ namespace Common
             aDigester.BlockUpdate(r2.ToByteArray(), 0, r2.ToByteArray().Length);
             aDigester.DoFinal(digested, 0);
             Public = new PublicSecret(digested.GetString(), r1);
-            Private = new PrivateSecret(aData.GetString(), r2);  
+            Private = new PrivateSecret(aData.GetString(), r2);
+        }
+
+        public Secret(byte[] aData, Guid aRandom1, Guid aRandom2, IDigest aDigester)
+        {
+            var r1 = aRandom1.ToByteArray();
+            var r2 = aRandom2.ToByteArray();
+            var digested = new byte[aDigester.GetByteLength()];
+            aDigester.Reset();
+            aDigester.BlockUpdate(aData, 0, aData.Length);
+            aDigester.BlockUpdate(r1, 0, r1.Length);
+            aDigester.BlockUpdate(r2, 0, r2.Length);
+            aDigester.DoFinal(digested, 0);
+            Public = new PublicSecret(digested.GetString(), aRandom1);
+            Private = new PrivateSecret(aData.GetString(), aRandom2);
         }
 
         private PrivateSecret _private;

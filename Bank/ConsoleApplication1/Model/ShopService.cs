@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Sklep.Model
 {
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.PerSession)]
-    class ShopService : IShopService 
+    public class ShopService : IShopService 
     {
 
       //  private static Dictionary<Guid, Banknote> _baknoteRepository = new Dictionary<Guid, Banknote>();
@@ -22,6 +22,26 @@ namespace Sklep.Model
         {
             this._callback = OperationContext.Current.GetCallbackChannel<IShopServiceCallback>();
             this._shop = new Shop(this, _callback);
+        }
+
+        public void doInit(Banknote aBanknote)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void doVerifySignature()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void doChooseSides()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void doVerifyBanknote()
+        {
+            throw new NotImplementedException();
         }
     }
 }

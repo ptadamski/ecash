@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BouncyCastle.Crypto">
-      <HintPath>..\packages\BouncyCastle.1.7.0\lib\Net40-Client\BouncyCastle.Crypto.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
@@ -53,9 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\lib\bccrypto-net-1.7-src-ext\csharp\crypto\crypto.csproj">
+      <Project>{38872a5f-e87e-4fad-b109-8eb7b2e6a4a0}</Project>
+      <Name>crypto</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Alicja\Alicja.csproj">
       <Project>{87b5287c-a82d-4148-8d18-d81cb8cf4b97}</Project>
       <Name>Alicja</Name>

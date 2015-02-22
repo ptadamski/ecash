@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Common;
 using Bank.Model;
 using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Engines;
 
 namespace Bank.Model
 {
@@ -21,7 +22,7 @@ namespace Bank.Model
         private Banknote _banknote;    
         private BanknoteAgreement _agreement;   
         //repository          
-        private Dictionary<Guid, Banknote> _banknotes;
+        private BanknoteRepository _repository;
         private Dictionary<Guid, BanknoteAgreement> _agreements = new Dictionary<Guid, BanknoteAgreement>();
         private Dictionary<PublicSecret, PrivateSecret> _secrets = new Dictionary<PublicSecret, PrivateSecret>();
          
@@ -32,9 +33,9 @@ namespace Bank.Model
         private IBankService _service;                     
         private IBankServiceCallback _callback;
 
-        public Bank(Dictionary<Guid, Banknote> aBanknoteRepository, IBankService aService, IBankServiceCallback aCallback)
+        public Bank(BanknoteRepository aBanknoteRepository, IBankService aService, IBankServiceCallback aCallback)
         {
-            this._banknotes = aBanknoteRepository;
+            this._repository = aBanknoteRepository;
             this._service = aService;
             this._callback = aCallback;
         }
@@ -50,49 +51,39 @@ namespace Bank.Model
         {
             _callback.onCreateAgreement(aIndex);
         }
-                                                            
-        public void doUncoverSecret(PublicSecret aSecret)
-        {
-            _callback.doUncoverSecret(aSecret);
-        }
 
         public void onVerifyAgreement(PublicSecret aBanknote, byte[] aBlindSignature, bool aAgreed)
         {
             _callback.onVerifyAgreement(aBanknote, aBlindSignature.GetString(), aAgreed);
         }
 
-        public void onVerifySecret(PublicSecret aSecret, bool aAgreed)
-        {
-            _callback.onVerifySecret(aSecret, aAgreed);
-        }
-
         #endregion
                                 
         #region IBank
 
-        public void doInit(Banknote aBanknote)
+        private bool _underCreation;
+
+        public void doInit(Banknote aBanknote, bool aUnderCreation)
         {
-            var serial = Guid.NewGuid();
-            while (_banknotes.ContainsKey(serial))
-                serial = Guid.NewGuid();
+            _underCreation = aUnderCreation;
+            _banknote = aBanknote;
 
-
-            _banknote = new Banknote();
-            _banknote.Serial = serial;
-            _banknote.Value = aBanknote.Value;
-                                                   
-            _banknotes.Add(_banknote.Serial, _banknote);
-                                                         
-            Console.WriteLine(_banknote.Serial);
-            Console.WriteLine(_banknote.Value);
-
-            Console.WriteLine("try callback");
-            onInit(_banknote, BanknoteCount, _pub); //callback    
-            Console.WriteLine("end callback");
+            if (aUnderCreation)
+            {           
+                _banknote = _repository.Construct();
+                _banknote.Value = aBanknote.Value;
+                _repository.Add(_banknote);         
+                onInit(_banknote, BanknoteCount, _pub); //callback   
+            }
+            
+           // Console.WriteLine(_banknote.ToXml());
         }
 
         public void doCreateAgreement(IList<byte[]> aBlindMessages)
         {
+            if (!_underCreation)
+                return;
+
             if (aBlindMessages.Count != BanknoteCount)
                 return;
 
@@ -105,6 +96,9 @@ namespace Bank.Model
 
         public void doVerifyAgreement(PublicSecret[] aSecrets, BigInteger[] aBlindingFactors)
         {
+            if (!_underCreation)
+                return;
+
             //(0) czy istnieje porozumienie w sprawie emisji banknotu
             if (_agreement == null)
                 return;
@@ -119,31 +113,6 @@ namespace Bank.Model
 
             onVerifyAgreement(aSecrets[_agreement.ForSignature], signature, signature != null);
         }
-                          
-        public void doCreateSecret(PublicSecret aSecret)
-        {
-            _secrets.Add(aSecret, null); 
-        }
-
-        public void doVerifySecret(PublicSecret aPublic, PrivateSecret aPrivate)
-        {              
-            //albo przyjmuje aPrivate jako dane, albo pozostawia null w repo
-            //PrivateSecret item = null;
-            //_secrets.TryGetValue(aPublic, out item);
-
-            //Sha256Digest digester = new Sha256Digest();
-            //var digestedBytes = new byte[digester.GetDigestSize()];
-
-            //var d = item.data.GetBytes();
-            //var r1 = aPublic.random1.ToByteArray();
-            //var r2 = item.random2.ToByteArray(); 
-
-            //digester.BlockUpdate(d, 0, d.Length);
-            //digester.BlockUpdate(r1, 0, r1.Length);
-            //digester.BlockUpdate(r2, 0, r2.Length);
-            //digester.DoFinal(digestedBytes, 0);
-            //return digestedBytes.IsEqual(item.Public.hash.GetBytes());
-        }
 
         #endregion
 
@@ -157,6 +126,48 @@ namespace Bank.Model
         {
             get { return _prv; }
             set { _prv = value; }
+        }
+
+        public void doDepone(Secret aBanknote, byte[] aSignature, int[] aIdIndexList, PrivateSecret[] aPartialIdList)
+        {
+            //(0)
+            Banknote banknote;
+            try
+            {
+                banknote = aBanknote.Private.data.FromXml<Banknote>();
+            }
+            catch(Exception)
+            {
+                banknote = new Banknote();
+            }
+
+            if (aIdIndexList.Length != aPartialIdList.Length)
+                return;
+
+            if (banknote.UserId.Length != aIdIndexList.Length)
+                return;
+
+            var digester = new Sha256Digest();
+            var eng = new RsaEngine();
+
+            //(1)czy na pewno hasz jest haszem tego banknotu?
+            var banknoteSecret = new Secret(aBanknote.Private.data.GetBytes(),
+                aBanknote.Public.random1, aBanknote.Private.random2, digester);
+
+            if (!banknoteSecret.Public.hash.Equals(aBanknote.Public.hash))
+                return;
+
+            //(2) czy hasz banknotu ma podpis
+            var h = aBanknote.Public.hash.GetBytes();
+            eng.Init(true, _prv);
+            var s = eng.ProcessBlock(h, 0, h.Length);
+
+            if (!s.IsEqual(aSignature))
+                return;
+
+            //(3) falszerstwo?
+
+
         }
     }        
 

@@ -16,7 +16,7 @@ namespace Alicja.BankService {
     public interface IBankService {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/doInit")]
-        void doInit(Common.Banknote aBanknote);
+        void doInit(Common.Banknote aBanknote, bool aUnderCreation);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/doCreateAgreement")]
         void doCreateAgreement(string[] aBlindMessages);
@@ -24,11 +24,8 @@ namespace Alicja.BankService {
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/doVerifyAgreement")]
         void doVerifyAgreement(Common.PublicSecret[] aSecrets, string[] aBlindingFactors);
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/doCreateSecret")]
-        void doCreateSecret(Common.PublicSecret aSecret);
-        
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/doVerifySecret")]
-        void doVerifySecret(Common.PublicSecret aPublic, Common.PrivateSecret aPrivate);
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/doDepone")]
+        void doDepone(Common.Secret aBanknote, string aSignature, int[] aIdIndexList, Common.PrivateSecret[] aPartialIdList);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -42,12 +39,6 @@ namespace Alicja.BankService {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/onVerifyAgreement")]
         void onVerifyAgreement(Common.PublicSecret aBanknote, string aBlindSignature, bool aAgreed);
-        
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/doUncoverSecret")]
-        void doUncoverSecret(Common.PublicSecret aSecret);
-        
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IBankService/onVerifySecret")]
-        void onVerifySecret(Common.PublicSecret aSecret, bool aAgreed);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -78,8 +69,8 @@ namespace Alicja.BankService {
                 base(callbackInstance, binding, remoteAddress) {
         }
         
-        public void doInit(Common.Banknote aBanknote) {
-            base.Channel.doInit(aBanknote);
+        public void doInit(Common.Banknote aBanknote, bool aUnderCreation) {
+            base.Channel.doInit(aBanknote, aUnderCreation);
         }
         
         public void doCreateAgreement(string[] aBlindMessages) {
@@ -90,12 +81,8 @@ namespace Alicja.BankService {
             base.Channel.doVerifyAgreement(aSecrets, aBlindingFactors);
         }
         
-        public void doCreateSecret(Common.PublicSecret aSecret) {
-            base.Channel.doCreateSecret(aSecret);
-        }
-        
-        public void doVerifySecret(Common.PublicSecret aPublic, Common.PrivateSecret aPrivate) {
-            base.Channel.doVerifySecret(aPublic, aPrivate);
+        public void doDepone(Common.Secret aBanknote, string aSignature, int[] aIdIndexList, Common.PrivateSecret[] aPartialIdList) {
+            base.Channel.doDepone(aBanknote, aSignature, aIdIndexList, aPartialIdList);
         }
     }
 }
