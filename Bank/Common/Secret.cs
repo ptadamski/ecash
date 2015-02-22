@@ -74,7 +74,7 @@ namespace Common
             aDigester.BlockUpdate(r2.ToByteArray(), 0, r2.ToByteArray().Length);
             aDigester.DoFinal(digested, 0);
             Public = new PublicSecret(digested.GetString(), r1);
-            Private = new PrivateSecret(aData.GetString(), r2);
+            Private = new PrivateSecret(aData.GetString(), r2);  
         }
 
         private PrivateSecret _private;

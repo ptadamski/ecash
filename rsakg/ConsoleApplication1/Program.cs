@@ -23,7 +23,7 @@ namespace ConsoleApplication1
             int strength = args.Length>2 ? int.Parse(args[1]) : 1024;
             kg.Init(new KeyGenerationParameters(new SecureRandom(), strength));
             var pair = kg.GenerateKeyPair();
-            Console.WriteLine("wygerowano klucze");
+            Console.WriteLine("wygenerowano klucze");
 
             PrivateKeyInfo privateKeyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(pair.Private);
             byte[] serializedPrivateBytes = privateKeyInfo.ToAsn1Object().GetDerEncoded();

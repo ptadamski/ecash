@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "crypto", "..\..\..\lib\bccrypto-net-1.7-src-ext\csharp\crypto\crypto.csproj", "{38872A5F-E87E-4FAD-B109-8EB7B2E6A4A0}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alicja", "Alicja\Alicja.csproj", "{87B5287C-A82D-4148-8D18-D81CB8CF4B97}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank", "Bank\Bank.csproj", "{A21EC03D-48B4-4C89-B084-92F136B60F4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sklep", "ConsoleApplication1\Sklep.csproj", "{2AFD5852-2D99-4D1E-91A3-12F54951A821}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{A21EC03D-48B4-4C89-B084-92F136B60F4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A21EC03D-48B4-4C89-B084-92F136B60F4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A21EC03D-48B4-4C89-B084-92F136B60F4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AFD5852-2D99-4D1E-91A3-12F54951A821}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AFD5852-2D99-4D1E-91A3-12F54951A821}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AFD5852-2D99-4D1E-91A3-12F54951A821}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AFD5852-2D99-4D1E-91A3-12F54951A821}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
