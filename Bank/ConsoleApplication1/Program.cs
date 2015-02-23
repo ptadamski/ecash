@@ -13,12 +13,20 @@ namespace Sklep
     {
         static void Main(string[] args)
         {
-            ServiceHost host = new ServiceHost(typeof(ShopService));
-            host.Open();
-            foreach (var item in host.BaseAddresses)
+            try
             {
-                Console.WriteLine(item);
+                ServiceHost host = new ServiceHost(typeof(ShopService));
+                host.Open();
+                foreach (var item in host.BaseAddresses)
+                {                                    
+                    Console.WriteLine(item);
+                }
             }
-        }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            Console.ReadLine();
+}
     }
 }

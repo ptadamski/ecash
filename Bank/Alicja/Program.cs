@@ -18,9 +18,16 @@ namespace Alicja
             var service = new BankService.BankServiceClient(callbackInstance);
             callback.Service = service;
 
+                                   
             var banknote = new Banknote();
-            banknote.Value = 30;
-            service.doInit(banknote,true);
+
+            while (true)
+            {
+                Console.WriteLine("Jaka wartosc banknoty chcesz uzyskac? ");
+                var s = Console.ReadLine();
+                var nominal = int.Parse(s); 
+                service.doInit(banknote,true);
+            }
             Console.ReadLine();
 
 

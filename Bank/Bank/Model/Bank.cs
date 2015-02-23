@@ -13,24 +13,24 @@ namespace Bank.Model
 {
 
     public class Bank : IBank, IBankCallback
-    {                                           
-        private static int BanknoteCount = 100;  
+    {
+        private static int BanknoteCount = 100;
         private static Random _rand = new Random();
-        private static RsaKeyParameters _pub; 
+        private static RsaKeyParameters _pub;
         private static RsaKeyParameters _prv;
         //data
-        private Banknote _banknote;    
-        private BanknoteAgreement _agreement;   
+        private Banknote _banknote;
+        private BanknoteAgreement _agreement;
         //repository          
         private BanknoteRepository _repository;
         private Dictionary<Guid, BanknoteAgreement> _agreements = new Dictionary<Guid, BanknoteAgreement>();
         private Dictionary<PublicSecret, PrivateSecret> _secrets = new Dictionary<PublicSecret, PrivateSecret>();
-         
+
         //factory                  
         //private IBanknoteFactory _banknoteFactory;  
         //private IBlindAgreementFactory _agreementFactory;
         //callback                                         
-        private IBankService _service;                     
+        private IBankService _service;
         private IBankServiceCallback _callback;
 
         public Bank(BanknoteRepository aBanknoteRepository, IBankService aService, IBankServiceCallback aCallback)
@@ -58,7 +58,7 @@ namespace Bank.Model
         }
 
         #endregion
-                                
+
         #region IBank
 
         private bool _underCreation;
@@ -69,14 +69,14 @@ namespace Bank.Model
             _banknote = aBanknote;
 
             if (aUnderCreation)
-            {           
+            {
                 _banknote = _repository.Construct();
                 _banknote.Value = aBanknote.Value;
-                _repository.Add(_banknote);         
+                _repository.Add(_banknote);
                 onInit(_banknote, BanknoteCount, _pub); //callback   
             }
-            
-           // Console.WriteLine(_banknote.ToXml());
+
+            Console.WriteLine("Rozpoczeto negocjacje banknotu o \n numerze seryjnym:{0} \n i wartosci:{1}", _banknote.Serial, _banknote.Value);
         }
 
         public void doCreateAgreement(IList<byte[]> aBlindMessages)
@@ -112,6 +112,8 @@ namespace Bank.Model
             var signature = _agreement.Sign(_prv);
 
             onVerifyAgreement(aSecrets[_agreement.ForSignature], signature, signature != null);
+            Console.WriteLine();
+            Console.WriteLine("Podpisano banknot nastepujaca sygnatura: {0}", signature.GetString());
         }
 
         #endregion
@@ -131,15 +133,18 @@ namespace Bank.Model
         public void doDepone(Secret aBanknote, byte[] aSignature, int[] aIdIndexList, PrivateSecret[] aPartialIdList)
         {
             //(0)
-            Banknote banknote;
+            Banknote banknote = null;
             try
             {
                 banknote = aBanknote.Private.data.FromXml<Banknote>();
             }
-            catch(Exception)
+            catch (Exception)
             {
-                banknote = new Banknote();
+                Console.WriteLine("pusty banknot?");
             }
+
+            if (banknote == null)
+                return;
 
             if (aIdIndexList.Length != aPartialIdList.Length)
                 return;
@@ -150,14 +155,14 @@ namespace Bank.Model
             var digester = new Sha256Digest();
             var eng = new RsaEngine();
 
-            //(1)czy na pewno hasz jest haszem tego banknotu?
+            //(1) czy H(d,r,l) = aBanknote.Public.hash; 
             var banknoteSecret = new Secret(aBanknote.Private.data.GetBytes(),
                 aBanknote.Public.random1, aBanknote.Private.random2, digester);
 
             if (!banknoteSecret.Public.hash.Equals(aBanknote.Public.hash))
                 return;
 
-            //(2) czy hasz banknotu ma podpis
+            //(2) czy SIG(h) =  aSignature
             var h = aBanknote.Public.hash.GetBytes();
             eng.Init(true, _prv);
             var s = eng.ProcessBlock(h, 0, h.Length);
@@ -166,10 +171,42 @@ namespace Bank.Model
                 return;
 
             //(3) falszerstwo?
+            //czy dostarczone guidy pochodza z banknotu?
+            for (int i = 0; i < aPartialIdList.Length; i++)
+            {
+                var userIdSecret = new Secret(aPartialIdList[i].data.GetBytes(),
+                    banknote.UserId[i].PartialId[aIdIndexList[i]].random1, aPartialIdList[i].random2, digester);
+                if (!userIdSecret.Public.hash.Equals(banknote.UserId[i].PartialId[aIdIndexList[i]].hash))
+                    return;
+            }
 
+            Guid client = Guid.NewGuid();
+            Guid suspect;
+            for (int i = 0; i < aPartialIdList.Length; i++)
+            {
+                var partialId = new Guid(aPartialIdList[i].data.GetBytes());
+                _repository.Update(banknote, aIdIndexList[i], partialId);
+                if (!_repository.Verify(client, banknote, out suspect))
+                {
+                    if (suspect.Equals(new Guid()))
+                    {
+                        Console.WriteLine("Ciekawe...");
+                    }
+                    else if (suspect.Equals(client))
+                    {
+                        Console.WriteLine("Oszukujesz...");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Oszukano cie...");
+                    }
+                    return;
+                }
 
+                Console.WriteLine("Banknote zdeponowano \n numer seryjny:{0} \n o wartosci:{1}", banknote.Serial, banknote.Value);
+            }
         }
-    }        
 
 
+    }
 }

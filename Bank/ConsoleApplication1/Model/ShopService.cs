@@ -20,8 +20,8 @@ namespace Sklep.Model
 
         public ShopService()
         {
-            this._callback = OperationContext.Current.GetCallbackChannel<IShopServiceCallback>();
-            this._shop = new Shop(this, _callback);
+            //this._callback = OperationContext.Current.GetCallbackChannel<IShopServiceCallback>();
+            //this._shop = new Shop(this, _callback);
         }
 
         public void doInit(Banknote aBanknote)

@@ -42,7 +42,7 @@ namespace Sklep.Interface
         void onChooseSides();
 
         [OperationContract(IsOneWay = true)]
-        void doVerifyBanknote();
+        void onVerifyBanknote();
 
         //[OperationContract(IsOneWay = true)]
         //void onVerifySecret(PublicSecret aSecret, bool aAgreed);
@@ -50,16 +50,9 @@ namespace Sklep.Interface
 
     interface IShop
     {
-        [OperationContract(IsOneWay = true, IsInitiating = true)]
         void doInit(Banknote aBanknote);
-
-        [OperationContract(IsOneWay = true)]
         void doVerifySignature();
-
-        [OperationContract(IsOneWay = true)]
         void doChooseSides();
-
-        [OperationContract(IsOneWay = true)]
         void doVerifyBanknote();
 
         //[OperationContract(IsOneWay = true)]
@@ -68,16 +61,9 @@ namespace Sklep.Interface
 
     public interface IShopCallback
     {
-        [OperationContract(IsOneWay = true)]
         void onInit();
-
-        [OperationContract(IsOneWay = true)]
         void onVerifySignature();
-
-        [OperationContract(IsOneWay = true)]
         void onChooseSides();
-
-        [OperationContract(IsOneWay = true)]
         void doVerifyBanknote();
 
         //[OperationContract(IsOneWay = true)]
