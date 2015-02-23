@@ -51,6 +51,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Service References\ShopService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="ShopServiceCallback.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +71,16 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\BankService\service1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\ShopService\Common.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\ShopService\service.wsdl" />
+    <None Include="Service References\ShopService\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\ShopService\service1.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
@@ -84,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\BankService\" />
+    <WCFMetadataStorage Include="Service References\ShopService\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Service References\BankService\configuration91.svcinfo" />
@@ -93,6 +109,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Service References\BankService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\ShopService\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\ShopService\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\ShopService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
